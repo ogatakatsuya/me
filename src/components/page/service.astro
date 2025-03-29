@@ -10,17 +10,20 @@ const services = [
     {
         title: "Hannavi",
         description: "A web platform connecting Osaka University circles and new students.",
-        image: ServicePath1
+        image: ServicePath1,
+        link: "https://www.i-maker.org"
     },
     {
         title: "Riddle App",
         description: "A puzzle-solving application modeled after university retake exams.",
-        image: ServicePath2
+        image: ServicePath2,
+        link: "https://qiita.com/Katsuya_Ogata/items/5e3bcdae3b63d46e1e1f"
     },
     {
         title: "Chatbot",
         description: "A course registration support chatbot utilizing RAG and prompting.",
-        image: ServicePath3
+        image: ServicePath3,
+        link: "https://example.com"
     },
 ];
 ---
@@ -39,7 +42,9 @@ const services = [
                             <Image src={service.image} alt="Service" class="absolute top-0 left-0 w-full h-full object-cover" />
                         </div>
                         <CardContent className="relative p-6">
-                            <h3 class="text-xl font-semibold mb-2">{service.title}</h3>
+                            <h3 class="text-xl font-semibold mb-2">
+                                <a href={service.link} class="hover:underline" target="_blank">{service.title}</a>
+                            </h3>
                             <p class="text-gray-600">{service.description}</p>
                         </CardContent>
                     </Card>
