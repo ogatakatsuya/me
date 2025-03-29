@@ -1,6 +1,8 @@
 ---
+import { Image } from 'astro:assets';
 import { Button } from "@/components/ui/button";
 import { Github, Mail } from "lucide-react";
+import QiitaIcon from "@/assets/qiita-icon.webp";
 ---
 
 <footer class="bg-zinc-300 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-8">
@@ -24,6 +26,9 @@ import { Github, Mail } from "lucide-react";
                         <Mail className="w-5 h-5" />
                     </a>
                 </Button>
+                <a href="https://qiita.com/Katsuya_Ogata" target="_blank" rel="noopener noreferrer">
+                    <Image src={QiitaIcon} alt="Qiita" class="w-5 h-5" />
+                </a>
             </div>
         </div>
     </div>
