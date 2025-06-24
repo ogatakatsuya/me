@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "biome format --write ./src"
   },
   "dependencies": {
     "@astrojs/react": "^4.2.2",
@@ -27,5 +28,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.17",
     "tw-animate-css": "^1.2.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.5"
   }
 }
