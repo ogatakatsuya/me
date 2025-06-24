@@ -1,15 +1,23 @@
 ---
-import { getCollection } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
-import Layout from '@/layouts/BaseLayout.astro';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Layout from "@/layouts/BaseLayout.astro";
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardDescription,
+	CardContent,
+} from "@/components/ui/card";
 
-const allPosts = await getCollection('blog');
+const allPosts = await getCollection("blog");
 const { searchParams } = Astro.url;
-const selectedTag = searchParams.get('tag');
+const selectedTag = searchParams.get("tag");
 const posts = selectedTag
-  ? allPosts.filter((post: CollectionEntry<'blog'>) => post.data.tags?.includes(selectedTag as string))
-  : allPosts;
+	? allPosts.filter((post: CollectionEntry<"blog">) =>
+			post.data.tags?.includes(selectedTag as string),
+		)
+	: allPosts;
 ---
 
 <Layout>
