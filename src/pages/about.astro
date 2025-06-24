@@ -1,8 +1,27 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import AboutTimeline from "@/components/page/about.astro";
 ---
 
 <BaseLayout>
-    <h1>About</h1>
-    <p>This is the about page.</p>
+  <section class="py-16 bg-gray-900 text-white min-h-[60vh] flex items-center">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-12">
+      {/* 左：テキスト */}
+      <div class="flex-1 max-w-xl">
+        <p class="text-lg mb-2">My name is</p>
+        <h1 class="text-5xl font-extrabold mb-2">Ogata Katsuya</h1>
+        <p class="mb-4 text-gray-300">Software Engineer</p>
+        <p class="mb-8 leading-relaxed text-gray-200">
+          Thank you for visiting my website! I am a software engineer and a student at Osaka University. 
+          I have participated in several hackathons and internships, and have worked on software development. 
+          I am also interested in AI technology and web services.
+        </p>
+      </div>
+      {/* 右：画像 */}
+      <div class="flex-1 flex justify-center">
+        <img src="/astro.svg" alt="宇宙飛行士のイラスト" class="w-72 h-72 object-contain rounded-full border-4 border-gray-700 shadow-xl bg-gray-800" />
+      </div>
+    </div>
+  </section>
+  <AboutTimeline />
 </BaseLayout>

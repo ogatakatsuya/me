@@ -1,40 +1,35 @@
 ---
-import "../../styles/global.css";
 ---
 
-<header class="bg-indigo-100 flex items-center justify-between h-16 px-10 dark:bg-gray-800">
-    <!-- Left: Logo and Site Name -->
-    <div class="flex items-center">
-        <h1 class="font-bold text-lg">Logo</h1>
-    </div>
-
-    <!-- Center: Navigation Menu -->
-    <nav class="flex flex-grow justify-center">
-        <ul class="flex gap-10">
-            <li><a href="/" class="text-sm font-medium hover:text-indigo-500">Home</a></li>
-            <li><a href="/about" class="text-sm font-medium hover:text-indigo-500">About</a></li>
-            <li><a href="/skill" class="text-sm font-medium hover:text-indigo-500">Skill</a></li>
-            <li><a href="/blog" class="text-sm font-medium hover:text-indigo-500">Blog</a></li>
-        </ul>
-    </nav>
-
-    <!-- Right: Dark Mode Toggle Button -->
-    <div class="flex items-center gap-4">
-        <button class="p-2 rounded-full hover:bg-indigo-200 dark:hover:bg-gray-700">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 5v.01M12 19v.01M5 12h.01M19 12h.01M12 2a10 10 0 00-6.93 16.93 10 10 0 0013.86-13.86A10 10 0 0012 2z"
-                ></path>
-            </svg>
+<header class="fixed w-full top-8 z-50 flex justify-center pointer-events-none">
+  <div class="bg-white/80 dark:bg-gray-900/80 border-2 border-gray-400 dark:border-yellow-100 rounded-xl shadow-md px-2 sm:px-4 py-2 w-[95vw] max-w-3xl pointer-events-auto transition-colors duration-300">
+    <nav class="flex flex-row flex-nowrap items-center justify-center gap-2 sm:gap-6 overflow-x-auto">
+      <div class="flex gap-6">
+        <a href="/" class="font-bold hover:underline hover:text-blue-500 dark:hover:text-yellow-300 active:scale-95 transition-transform duration-100">Home</a>
+        <a href="/about" class="font-bold hover:underline hover:text-blue-500 dark:hover:text-yellow-300 active:scale-95 transition-transform duration-100">About</a>
+        <a href="/blog" class="font-bold hover:underline hover:text-blue-500 dark:hover:text-yellow-300 active:scale-95 transition-transform duration-100">Blog</a>
+      </div>
+      <div class="flex items-center">
+        <button id="toggle-darkmode" aria-label="ダーク/ライト切り替え" class="p-2 rounded transition text-xl hover:bg-blue-100/40 hover:text-blue-600 dark:hover:bg-yellow-900/30 dark:hover:text-yellow-300 active:scale-90 duration-100">
+          🌙
         </button>
-    </div>
+      </div>
+    </nav>
+  </div>
 </header>
+
+<script>
+  import { initDarkMode, setLightMode, setDarkMode, isDark, updateButton } from "../../lib/darkmode";
+
+  initDarkMode();
+
+  const btn = document.getElementById("toggle-darkmode");
+  if (btn) {     
+        btn.addEventListener("click", () => {
+            isDark() ? setLightMode() : setDarkMode();
+            updateButton();
+        });
+  }
+</script>
+
+
