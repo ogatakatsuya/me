@@ -40,4 +40,5 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-        run: echo ${{ env.CHANGED_FILES }}
+        run: |
+          node scripts/invokeLambda.ts
