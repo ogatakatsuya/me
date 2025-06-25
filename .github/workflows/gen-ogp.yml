@@ -41,4 +41,4 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          node scripts/invokeLambda.ts
+          pnpm exec tsx scripts/invokeLambda.ts

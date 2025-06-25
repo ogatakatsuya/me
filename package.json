@@ -33,6 +33,7 @@
     "tw-animate-css": "^1.2.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.5"
+    "@biomejs/biome": "^2.0.5",
+    "tsx": "^4.20.3"
   }
 }
