@@ -1,7 +1,14 @@
 import fs from 'fs';
 import matter from 'gray-matter';
 
-async function processFile(filePath: string) {
+type ExtractedMetadata = {
+  title: string;
+  tags: string[];
+}
+
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+
+async function processFile(filePath: string): Promise<void> {
     console.log(`Processing: ${filePath}`);
     const metadata = extractMetadata(filePath);
     if (!metadata) {
@@ -9,12 +16,18 @@ async function processFile(filePath: string) {
       return;
     }
 
-    console.log(metadata);
-}
+    const lambdaClient = new LambdaClient({});
+    const invokeParams = {
+      FunctionName: 'ogp-generator',
+      InvocationType: 'RequestResponse' as const,
+      Payload: JSON.stringify({
+        title: metadata.title,
+        tags: metadata.tags,
+      }),
+    };
 
-type ExtractedMetadata = {
-  title: string;
-  tags: string[];
+    const response = await lambdaClient.send(new InvokeCommand(invokeParams));
+    console.log(`Lambda response for ${filePath}:`, response);
 }
 
 function extractMetadata(filePath: string): ExtractedMetadata | undefined {
