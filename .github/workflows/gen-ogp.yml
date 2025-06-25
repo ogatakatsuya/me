@@ -1,0 +1,43 @@
+name: Generate OGP Images on MDX Change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/content/blog/**.mdx'
+
+jobs:
+  invoke-lambda:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            src/content/blog/**.mdx
+
+      - name: Setup pnpm
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Request OGP Image Generation
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: echo ${{ env.CHANGED_FILES }}
