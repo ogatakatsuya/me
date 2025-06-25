@@ -1,0 +1,77 @@
+---
+const {page, baseUrl} = Astro.props;
+const totalPages = page.lastPage;
+const pageNumbers = Array.from({length: totalPages}, (_, i) => {
+  return i + 1;
+});
+
+const getPageUrl = (pageNumber: number) => {
+  return pageNumber === 1 ? page.url.first : `${baseUrl}/${pageNumber}`;
+}
+---
+ 
+<nav class="flex justify-center items-center space-x-2 my-8" aria-label="ページネーション">
+  <ul class="flex items-center space-x-1 sm:space-x-2">
+    <li>
+      {page.url.first ? (
+        <a class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200" href={page.url.first} aria-label="最初のページ">
+          <span class="text-xs sm:text-sm font-medium">&lt;&lt;</span>
+        </a>
+      ) : (
+        <span class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed">
+          <span class="text-xs sm:text-sm font-medium">&lt;&lt;</span>
+        </span>
+      )}
+    </li>
+
+    <li>
+      {page.url.prev ? (
+        <a class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200" href={page.url.prev} aria-label="前のページ">
+          <span class="text-xs sm:text-sm font-medium">&lt;</span>
+        </a>
+      ) : (
+        <span class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed">
+          <span class="text-xs sm:text-sm font-medium">&lt;</span>
+        </span>
+      )}
+    </li>
+
+    {pageNumbers.map((pageNumber) => (
+      <li>
+        {page.currentPage === pageNumber ? (
+          <span class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-gray-700 font-medium text-xs sm:text-sm" aria-current="page">
+            {pageNumber}
+          </span>
+        ) : (
+          <a class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 text-xs sm:text-sm font-medium" href={getPageUrl(pageNumber)}>
+            {pageNumber}
+          </a>
+        )}
+      </li>
+    ))}
+
+    <li>
+      {page.url.next ? (
+        <a class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200" href={page.url.next} aria-label="次のページ">
+          <span class="text-xs sm:text-sm font-medium">&gt;</span>
+        </a>
+      ) : (
+        <span class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed">
+          <span class="text-xs sm:text-sm font-medium">&gt;</span>
+        </span>
+      )}
+    </li>
+
+    <li>
+      {page.url.last ? (
+        <a class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200" href={page.url.last} aria-label="最後のページ">
+          <span class="text-xs sm:text-sm font-medium">&gt;&gt;</span>
+        </a>
+      ) : (
+        <span class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed">
+          <span class="text-xs sm:text-sm font-medium">&gt;&gt;</span>
+        </span>
+      )}
+    </li>
+  </ul>
+</nav>

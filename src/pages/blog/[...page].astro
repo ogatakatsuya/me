@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import type { PaginateFunction } from "astro";
+
+import Layout from "@/layouts/BaseLayout.astro";
+import ArticleList from "@/components/page/ArticleList.astro";
+import Pagination from "@/components/ui/Pagination.astro";
+import { COUNT_PER_PAGE } from "@/lib/constant";
+
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const allPosts = await getCollection("blog");
+
+  const sortedPosts = allPosts.sort((a, b) => {
+    const aDate = new Date(a.data.date);
+    const bDate = new Date(b.data.date);
+    return bDate.getTime() - aDate.getTime();
+  });
+
+  return paginate(sortedPosts, { pageSize: COUNT_PER_PAGE });
+}
+
+const { page } = Astro.props;
+---
+
+<Layout>
+  <div class="flex flex-col items-center w-full">
+    <h1 class="text-4xl font-bold mt-40 mb-10">Blog</h1>
+    <ArticleList page={page} />
+    <Pagination page={page} baseUrl="/blog" />
+  </div>
+</Layout> 
