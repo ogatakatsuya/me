@@ -11,7 +11,7 @@
       </div>
       <div class="flex items-center">
         <button id="toggle-darkmode" aria-label="ダーク/ライト切り替え" class="p-2 rounded transition text-xl hover:bg-blue-100/40 hover:text-blue-600 dark:hover:bg-yellow-900/30 dark:hover:text-yellow-300 active:scale-90 duration-100">
-          🌙
+          🌞
         </button>
       </div>
     </nav>
@@ -22,6 +22,7 @@
   import { initDarkMode, setLightMode, setDarkMode, isDark, updateButton } from "../../lib/darkmode";
 
   initDarkMode();
+  updateButton();
 
   const btn = document.getElementById("toggle-darkmode");
   if (btn) {     
