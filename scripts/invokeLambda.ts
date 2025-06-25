@@ -1,12 +1,12 @@
 import fs from 'fs';
 import matter from 'gray-matter';
 
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+
 type ExtractedMetadata = {
   title: string;
   tags: string[];
 }
-
-import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 
 async function processFile(filePath: string): Promise<void> {
     console.log(`Processing: ${filePath}`);
