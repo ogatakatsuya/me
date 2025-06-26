@@ -19,10 +19,11 @@
 </header>
 
 <script>
-  import { initDarkMode, setLightMode, setDarkMode, isDark, updateButton } from "../../lib/darkmode";
+  import { initDarkMode, setLightMode, setDarkMode, isDark, updateButton, watchSystemMode } from "../../lib/darkmode";
 
   initDarkMode();
   updateButton();
+  watchSystemMode();
 
   const btn = document.getElementById("toggle-darkmode");
   if (btn) {     
