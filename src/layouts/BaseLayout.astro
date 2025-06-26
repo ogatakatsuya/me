@@ -28,7 +28,7 @@ const meta: Props = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 		<meta name="generator" content={Astro.generator} />
-		{meta.title ? <title>Blog | {meta.title}</title> : <title>Ogata Katsuya's Portfolio</title>}
+		{meta.title ? <title>{meta.title}</title> : <title>Ogata Katsuya's Portfolio</title>}
 		{meta.description ? <meta name="description" content={meta.description} /> : <meta name="description" content="Ogata Katsuya's Portfolio" />}
 		<meta name="pagefind-meta" content={meta.pagefind ? "true" : "false"} /> 
 		<meta property="og:type" content={meta.type ?? "website"} />
