@@ -1,6 +1,23 @@
 ---
 import "../styles/global.css";
 import Header from "@/components/layout/header.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  pagefind: boolean;
+  header?: boolean;
+  footer?: boolean;
+  og: {
+    enabled: boolean;
+    image?: URL;
+    width?: number;
+    height?: number;
+  };
+	type: "article" | "website";
+}
+
+const meta: Props = Astro.props;
 ---
 
 <!doctype html>
@@ -11,7 +28,27 @@ import Header from "@/components/layout/header.astro";
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 		<meta name="generator" content={Astro.generator} />
-		<title>My Portfolio</title>
+		{meta.title ? <title>Blog | {meta.title}</title> : <title>Ogata Katsuya's Portfolio</title>}
+		{meta.description ? <meta name="description" content={meta.description} /> : <meta name="description" content="Ogata Katsuya's Portfolio" />}
+		<meta name="pagefind-meta" content={meta.pagefind ? "true" : "false"} /> 
+		<meta property="og:type" content={meta.type ?? "website"} />
+    {
+      meta.og.enabled && (
+        <>
+          <meta
+            property="og:image"
+            content={meta.og.image ?? new URL("/og-image.png", Astro.url)}
+            data-pagefind-meta={meta.pagefind ? "image[content]" : null}
+          />	
+          <meta property="og:image:width" content={`${meta.og.width ?? 720}`} />
+          <meta property="og:image:height" content={`${meta.og.height ?? 720}`} />
+          <meta
+            name="twitter:card"
+            content={meta.type === "article" ? "summary_large_image" : "summary"}
+          />
+        </>
+      )
+    }
 	</head>
 	<body class="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-gray-900 dark:to-gray-800">
 		<Header />
