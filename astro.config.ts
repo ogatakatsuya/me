@@ -2,11 +2,9 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
-
 import sitemap from '@astrojs/sitemap';
-
 import mdx from '@astrojs/mdx';
-
+ 
 // https://astro.build/config
 export default defineConfig({
     site: 'https://ogatakatsuya.com',
@@ -14,4 +12,12 @@ export default defineConfig({
         plugins: [tailwindcss()],
     },
     integrations: [react(), sitemap(), mdx()],
+    markdown: {
+        shikiConfig: {
+          themes: {
+            light: 'gruvbox-light-hard',
+            dark: 'gruvbox-dark-hard',
+          },
+        },
+      },
 });
