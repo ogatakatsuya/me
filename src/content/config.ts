@@ -1,5 +1,5 @@
 import { defineCollection, z } from "astro:content";
-import { glob } from 'astro/loaders';
+import { glob } from "astro/loaders";
 
 const blog = defineCollection({
 	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
@@ -8,7 +8,9 @@ const blog = defineCollection({
 		date: z.coerce.date(),
 		tags: z.array(z.string()),
 		summary: z.string(),
-		theme: z.enum(["tech", "idea", "diary", "info", "default"]).default("default"),
+		theme: z
+			.enum(["tech", "idea", "diary", "info", "default"])
+			.default("default"),
 	}),
 });
 

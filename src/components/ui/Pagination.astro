@@ -1,13 +1,13 @@
 ---
-const {page, baseUrl} = Astro.props;
+const { page, baseUrl } = Astro.props;
 const totalPages = page.lastPage;
-const pageNumbers = Array.from({length: totalPages}, (_, i) => {
-  return i + 1;
+const pageNumbers = Array.from({ length: totalPages }, (_, i) => {
+	return i + 1;
 });
 
 const getPageUrl = (pageNumber: number) => {
-  return pageNumber === 1 ? page.url.first : `${baseUrl}/${pageNumber}`;
-}
+	return pageNumber === 1 ? page.url.first : `${baseUrl}/${pageNumber}`;
+};
 ---
  
 <nav class="flex justify-center items-center space-x-2 my-8" aria-label="ページネーション">

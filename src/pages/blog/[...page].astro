@@ -7,16 +7,20 @@ import ArticleList from "@/components/page/ArticleList.astro";
 import Pagination from "@/components/ui/Pagination.astro";
 import { COUNT_PER_PAGE } from "@/lib/constant";
 
-export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
-  const allPosts = await getCollection("blog");
+export async function getStaticPaths({
+	paginate,
+}: {
+	paginate: PaginateFunction;
+}) {
+	const allPosts = await getCollection("blog");
 
-  const sortedPosts = allPosts.sort((a, b) => {
-    const aDate = new Date(a.data.date);
-    const bDate = new Date(b.data.date);
-    return bDate.getTime() - aDate.getTime();
-  });
+	const sortedPosts = allPosts.sort((a, b) => {
+		const aDate = new Date(a.data.date);
+		const bDate = new Date(b.data.date);
+		return bDate.getTime() - aDate.getTime();
+	});
 
-  return paginate(sortedPosts, { pageSize: COUNT_PER_PAGE });
+	return paginate(sortedPosts, { pageSize: COUNT_PER_PAGE });
 }
 
 const { page } = Astro.props;

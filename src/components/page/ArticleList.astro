@@ -2,15 +2,10 @@
 import type { CollectionEntry } from "astro:content";
 import type { Page } from "astro";
 
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface Props {
-  page: Page<CollectionEntry<"blog">>;
+	page: Page<CollectionEntry<"blog">>;
 }
 const { page } = Astro.props;
 ---

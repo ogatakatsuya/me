@@ -120,51 +120,51 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .astro-code,
-  .astro-code span {
-    color: var(--shiki-dark) !important;
-    background-color: var(--shiki-dark-bg) !important;
-    /* フォントスタイルを変更したい場合のみ */
-    font-style: var(--shiki-dark-font-style) !important;
-    font-weight: var(--shiki-dark-font-weight) !important;
-    text-decoration: var(--shiki-dark-text-decoration) !important;
-  }
+	.astro-code,
+	.astro-code span {
+		color: var(--shiki-dark) !important;
+		background-color: var(--shiki-dark-bg) !important;
+		/* フォントスタイルを変更したい場合のみ */
+		font-style: var(--shiki-dark-font-style) !important;
+		font-weight: var(--shiki-dark-font-weight) !important;
+		text-decoration: var(--shiki-dark-text-decoration) !important;
+	}
 }
 
 /* rehype-pretty-code のダークモード対応 */
 .astro-code {
-  border-radius: 0.5rem;
-  overflow: hidden;
-  margin: 1.5rem 0;
+	border-radius: 0.5rem;
+	overflow: hidden;
+	margin: 1.5rem 0;
 }
 
 /* ライトモード用のコードブロックスタイル */
 .astro-code {
-  background-color: var(--shiki-light-bg);
-  color: var(--shiki-light);
+	background-color: var(--shiki-light-bg);
+	color: var(--shiki-light);
 }
 
 /* ダークモード用のコードブロックスタイル */
 .dark .astro-code {
-  background-color: var(--shiki-dark-bg);
-  color: var(--shiki-dark);
+	background-color: var(--shiki-dark-bg);
+	color: var(--shiki-dark);
 }
 
 .astro-code::before {
-  content: attr(data-language);
-  display: block;
-  background-color: #d99a47;
-  color: #524c6c;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
+	content: attr(data-language);
+	display: block;
+	background-color: #d99a47;
+	color: #524c6c;
+	padding: 0.5rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	border-bottom: 1px solid #e2e8f0;
 }
 
 .dark .astro-code::before {
-  background-color: #141b28;
-  color: #94a3b8;
-  border-bottom-color: #334155;
+	background-color: #141b28;
+	color: #94a3b8;
+	border-bottom-color: #334155;
 }
