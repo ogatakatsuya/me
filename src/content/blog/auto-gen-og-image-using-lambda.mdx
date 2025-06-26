@@ -74,7 +74,7 @@ export const handler: Handler = async (event) => {
 
 Astroのheadタグ内に以下のように記述しておくことで、各ページのタイトルを使ってOG画像を設定できます。
 
-```Astro title="src/pages/blog/[slug].astro"
+```astro title="src/pages/blog/[slug].astro"
 <head>
   <meta property="og:title" content={post.data.title} />
   <meta property="og:image" content={`https://your-cloudflare-domain.com/og-image?title=${encodeURIComponent(post.data.title)}`} />
