@@ -6,6 +6,7 @@ import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 type ExtractedMetadata = {
   title: string;
   tags: string[];
+  theme: string;
 }
 
 async function processFile(filePath: string): Promise<void> {
@@ -23,6 +24,7 @@ async function processFile(filePath: string): Promise<void> {
       Payload: JSON.stringify({
         title: metadata.title,
         tags: metadata.tags,
+        theme: metadata.theme
       }),
     };
 
