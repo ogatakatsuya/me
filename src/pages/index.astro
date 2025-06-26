@@ -3,6 +3,15 @@ import Layout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/page/Hero.astro";
 ---
 
-<Layout>
+<Layout
+	title="Home"
+	description="Ogata Katsuya's Portfolio"
+	pagefind={true}
+	og={{
+		enabled: true,
+		image: new URL("/og-image.png", Astro.url),
+	}}
+	type="website"
+>
 	<Hero />
 </Layout>

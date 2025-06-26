@@ -1,10 +1,19 @@
 ---
-import BaseLayout from "@/layouts/BaseLayout.astro";
+import Layout from "@/layouts/BaseLayout.astro";
 import AboutTimeline from "@/components/page/Experience.astro";
 ---
 
-<BaseLayout>
+<Layout
+    title="About"
+    description="About Ogata Katsuya"
+    pagefind={true}
+    og={{
+        enabled: true,
+        image: new URL("/og-image.png", Astro.url),
+    }}
+    type="website"
+>
   <div class="mt-40">
     <AboutTimeline />
   </div>
-</BaseLayout>
+</Layout>
