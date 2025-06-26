@@ -1,0 +1,36 @@
+---
+import { Icon } from 'astro-icon/components'
+
+type SNS = {
+    name: string;
+    url: string;
+}
+
+const snsList: SNS[] = [
+    {
+        name: "bxl:github",
+        url: "https://github.com/ogatakatsuya",
+    },
+    {
+        name: "entypo-social:twitter",
+        url: "https://x.com/Z9dSD9YR962sLWs",
+    },
+    {
+        name: "bxl:instagram",
+        url: "https://www.instagram.com/o_k12_25",
+    },
+    {
+        name: "bxl:linkedin-square",
+        url: "https://www.linkedin.com/in/%E5%85%8B%E5%93%89-%E7%B7%92%E6%96%B9-345395335/",
+    },
+]
+---
+
+<div class="flex justify-left gap-4">
+    {snsList.map((sns) => (
+        <a href={sns.url} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-200 transition-colors duration-300">
+            <Icon name={sns.name} class="w-8 h-8" />
+        </a>
+    ))}
+</div>
+
