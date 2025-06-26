@@ -1,6 +1,7 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import Layout from "@/layouts/BaseLayout.astro";
+import Article from "@/components/page/Article.astro";
 
 export async function getStaticPaths() {
 	const posts = await getCollection("blog");
@@ -11,15 +12,51 @@ export async function getStaticPaths() {
 }
 
 const post = Astro.props;
+const { Content } = await render(post);
 ---
 
 <Layout>
-    <article>
-    <h1>{post.data.title}</h1>
-    <div>公開日: {post.data.date}</div>
-    <div>タグ: {post.data.tags?.join(', ')}</div>
-    <div>{post.data.summary}</div>
-    <hr />
-        <div set:html={post.body} />
-    </article>
+    <main class="min-h-screen pt-30 pb-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <article class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 lg:p-12">
+                <!-- 記事ヘッダー -->
+                <header class="mb-8">
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                        {post.data.title}
+                    </h1>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
+                        <div class="flex items-center">
+                            <span class="mr-2">📅</span>
+                            <time datetime={post.data.date.toISOString()}>
+                                {post.data.date.toLocaleDateString('ja-JP', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                            </time>
+                        </div>
+                        {post.data.tags && post.data.tags.length > 0 && (
+                            <div class="flex items-center">
+                                <span class="mr-2">🏷️</span>
+                                <div class="flex flex-wrap gap-2">
+                                    {post.data.tags.map((tag: string) => (
+                                        <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    {post.data.summary && (
+                        <div class="text-md md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed border-l-4 border-blue-500 pl-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-r-lg">
+                            {post.data.summary}
+                        </div>
+                    )}
+                </header>
+
+                <Article post={post} />
+            </article>
+        </div>
+    </main>
 </Layout> 
