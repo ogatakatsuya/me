@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/BaseLayout.astro";
 import AboutTimeline from "@/components/page/Experience.astro";
+import Title from "@/components/page/Title.astro";
 ---
 
 <Layout
@@ -13,7 +14,6 @@ import AboutTimeline from "@/components/page/Experience.astro";
     }}
     type="website"
 >
-  <div class="mt-40">
-    <AboutTimeline />
-  </div>
+  <Title title="About" />
+  <AboutTimeline />
 </Layout>
