@@ -34,6 +34,49 @@ Lambda関数は以下のような処理を担います：
 3. Puppeteer や `@vercel/og` を使って画像として描画
 4. `Content-Type: image/png` でレスポンスを返す
 
+```typescript
+import { createCanvas, loadImage } from 'canvas';
+import { Handler } from 'aws-lambda';
+
+export const handler: Handler = async (event) => {
+  const title = event.queryStringParameters?.title || 'Default Title';
+  
+  // キャンバスのサイズを設定
+  const width = 1200;
+  const height = 630;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  // 背景色を設定
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+
+  // タイトルを描画
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 48px Arial';
+  ctx.fillText(title, 50, height / 2);
+
+  // PNG画像として出力
+  const buffer = canvas.toBuffer('image/png');
+  
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'image/png',
+    },
+    body: buffer.toString('base64'),
+    isBase64Encoded: true,
+  };
+};
+```
+
 ## Astro側でOG画像URLを動的に設定
 
 Astroのheadタグ内に以下のように記述しておくことで、各ページのタイトルを使ってOG画像を設定できます。
+
+```Astro
+<head>
+  <meta property="og:title" content={post.data.title} />
+  <meta property="og:image" content={`https://your-cloudflare-domain.com/og-image?title=${encodeURIComponent(post.data.title)}`} />
+</head>
+```
