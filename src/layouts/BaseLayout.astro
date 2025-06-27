@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import "../styles/global.css";
 import Header from "@/components/layout/header.astro";
 import GoogleAnalytics from "@/components/page/GoogleAnalytics.astro";
@@ -70,6 +71,7 @@ const meta: Props = Astro.props;
       }
     </script>
 		<GoogleAnalytics />
+		<ClientRouter />
 	</head>
 	<body class="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-gray-900 dark:to-gray-800">
 		<Header />

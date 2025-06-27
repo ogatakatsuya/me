@@ -1,4 +1,5 @@
 ---
+import ThemeIcon from "../page/ThemeIcon.astro"
 ---
 
 <header class="fixed w-full top-8 z-50 flex justify-center pointer-events-none">
@@ -9,28 +10,7 @@
         <a href="/about" class="font-bold hover:underline hover:text-blue-500 dark:hover:text-yellow-300 active:scale-95 transition-transform duration-100">About</a>
         <a href="/blog" class="font-bold hover:underline hover:text-blue-500 dark:hover:text-yellow-300 active:scale-95 transition-transform duration-100">Blog</a>
       </div>
-      <div class="flex items-center">
-        <button id="toggle-darkmode" aria-label="ダーク/ライト切り替え" class="p-2 rounded transition text-xl hover:bg-blue-100/40 hover:text-blue-600 dark:hover:bg-yellow-900/30 dark:hover:text-yellow-300 active:scale-90 duration-100">
-          🌞
-        </button>
-      </div>
+      <ThemeIcon />
     </nav>
   </div>
 </header>
-
-<script>
-  import { setLightMode, setDarkMode, isDark, updateButton, watchSystemMode } from "../../lib/darkmode";
-
-  updateButton();
-  watchSystemMode();
-
-  const btn = document.getElementById("toggle-darkmode");
-  if (btn) {     
-        btn.addEventListener("click", () => {
-            isDark() ? setLightMode() : setDarkMode();
-            updateButton();
-        });
-  }
-</script>
-
-
