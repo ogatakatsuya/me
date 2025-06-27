@@ -8,11 +8,11 @@ type SNS = {
 
 const snsList: SNS[] = [
     {
-        name: "bxl:github",
+        name: "ri:github-line",
         url: "https://github.com/ogatakatsuya",
     },
     {
-        name: "entypo-social:twitter",
+        name: "ri:twitter-x-fill",
         url: "https://x.com/Z9dSD9YR962sLWs",
     },
     {
@@ -20,7 +20,7 @@ const snsList: SNS[] = [
         url: "https://www.instagram.com/o_k12_25",
     },
     {
-        name: "bxl:linkedin-square",
+        name: "ri:linkedin-box-fill",
         url: "https://www.linkedin.com/in/%E5%85%8B%E5%93%89-%E7%B7%92%E6%96%B9-345395335/",
     },
 ]
@@ -28,7 +28,7 @@ const snsList: SNS[] = [
 
 <div class="flex justify-left gap-4 mb-8">
     {snsList.map((sns) => (
-        <a href={sns.url} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-200 transition-colors duration-300">
+        <a href={sns.url} target="_blank" rel="noopener noreferrer" class="hover:text-gray-200 transition-colors duration-300">
             <Icon name={sns.name} class="w-8 h-8" />
         </a>
     ))}

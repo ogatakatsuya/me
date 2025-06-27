@@ -5,14 +5,14 @@ import Title from "@/components/page/Title.astro";
 ---
 
 <Layout
-    title="About"
-    description="About Ogata Katsuya"
-    pagefind={true}
-    og={{
-        enabled: true,
-        image: new URL("/og-image.png", Astro.url),
-    }}
-    type="website"
+  title="About"
+  description="About Ogata Katsuya"
+  pagefind={true}
+  og={{
+      enabled: true,
+      image: new URL("/og-image.png", Astro.url),
+  }}
+  type="website"
 >
   <Title title="About" />
   <AboutTimeline />

@@ -39,7 +39,7 @@
     "@aws-sdk/client-lambda": "^3.835.0",
     "@biomejs/biome": "^2.0.5",
     "@iconify-json/bxl": "^1.2.2",
-    "@iconify-json/entypo-social": "^1.2.2",
+    "@iconify-json/ri": "^1.2.5",
     "tsx": "^4.20.3"
   }
 }
