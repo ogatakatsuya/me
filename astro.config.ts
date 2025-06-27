@@ -9,6 +9,8 @@ import expressiveCode from 'astro-expressive-code';
 
 import icon from 'astro-icon';
 
+import partytown from '@astrojs/partytown';
+
 // https://astro.build/config
 export default defineConfig({
     site: 'https://www.ogatakatsuya.com',
@@ -21,7 +23,7 @@ export default defineConfig({
         preserveIndent: true,
       },
       themes: ['everforest-dark', 'everforest-light'],
-    }), mdx(), icon()],
+    }), mdx(), icon(), partytown()],
     image: {
       remotePatterns: [{
         protocol: 'https',
