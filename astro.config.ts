@@ -22,4 +22,10 @@ export default defineConfig({
       },
       themes: ['everforest-dark', 'everforest-light'],
     }), mdx(), icon()],
+    image: {
+      remotePatterns: [{
+        protocol: 'https',
+        hostname: 'storage.r2.ogatakatsuya.com',
+      }],
+    }
 });
