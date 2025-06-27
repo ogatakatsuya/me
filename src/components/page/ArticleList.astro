@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import type { Page } from "astro";
+import { Image } from "astro:assets";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
@@ -14,7 +15,7 @@ const { page } = Astro.props;
   {page.data.map((post: CollectionEntry<'blog'>) => (
     <Card className="w-full max-w-xs flex flex-col h-full min-h-[200px] p-2 bg-slate-200 dark:bg-slate-800">
       <CardHeader className="p-0">
-        <img
+        <Image
           src={`https://storage.r2.ogatakatsuya.com/${post.data.title}.png`}
           alt={post.data.title}
           width="1200"
