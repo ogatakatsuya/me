@@ -1,24 +1,3 @@
-export function initDarkMode() {
-	// localStorageにテーマ設定がない場合は、OSの設定に従う
-	if (!localStorage.theme) {
-		const prefersDark = window.matchMedia(
-			"(prefers-color-scheme: dark)",
-		).matches;
-		if (prefersDark) {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.remove("dark");
-		}
-	} else {
-		// localStorageに設定がある場合は、その設定を適用
-		if (localStorage.theme === "dark") {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.remove("dark");
-		}
-	}
-}
-
 export function isDark() {
 	return document.documentElement.classList.contains("dark");
 }
