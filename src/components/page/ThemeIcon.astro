@@ -1,13 +1,20 @@
 ---
+import { Icon } from "astro-icon/components";
 ---
 
-<div class="relative group/ThemeIcon">
-  <button id="themeToggle" class="absolute inset-0 rounded-full overflow-hidden" transition:persist aria-label="外観を切り替える">
-    <div class="group-[.has-text]/ThemeIcon:!hidden w-full h-full dark:hidden" data-tooltip-id="global-tooltip" data-tooltip-content="ページを暗くする"></div>
-    <div class="group-[.has-text]/ThemeIcon:!hidden w-full h-full hidden dark:block" data-tooltip-id="global-tooltip" data-tooltip-content="ページを明るくする"></div>
+<div class="group/ThemeIcon">
+  <button
+    id="themeToggle"
+    class="rounded-full overflow-hidden w-10 h-10 flex items-center justify-center transition-colors hover:bg-gray-300 dark:hover:bg-gray-800"
+    aria-label="外観を切り替える"
+  >
+    <span class="block dark:hidden">
+      <Icon name="ri:moon-line" class="w-6 h-6" />
+    </span>
+    <span class="hidden dark:block">
+      <Icon name="ri:sun-line" class="w-6 h-6" />
+    </span>
   </button>
-  <button class="hidden dark:block text-2xl">🌞</button>
-  <button class="dark:hidden text-2xl">🌝</button>
 </div>
 
 <script is:inline>
@@ -19,7 +26,7 @@
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         return "dark";
       }
-        return "light";
+      return "light";
     })();
 
     if (theme === "light") {
@@ -46,10 +53,4 @@
   };
 
   document.getElementById("themeToggle").addEventListener("click", handleThemeToggleClick);
-
-  if ('ontouchstart' in window || navigator.maxTouchPoints) {
-    document.getElementById("themeToggle").querySelectorAll("div").forEach(div => {
-      div.style.display = "none";
-    });
-  }
 </script>
