@@ -23,7 +23,15 @@ export default defineConfig({
         preserveIndent: true,
       },
       themes: ['everforest-dark', 'everforest-light'],
-    }), mdx(), icon(), partytown()],
+    }), 
+    mdx(), 
+    icon(), 
+    partytown({
+      config: {
+        forward: ["dataLayer.push"],
+      },
+    })
+  ],
     image: {
       remotePatterns: [{
         protocol: 'https',
