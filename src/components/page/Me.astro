@@ -1,0 +1,101 @@
+---
+import { Image } from "astro:assets";
+import IconPath from "@/assets/icon.webp";
+import Line from "@/components/ui/Line.astro";
+
+const profile = {
+  name: "Ogata Katsuya",
+  age: 22,
+  birthday: "2003/12/25",
+  university: "Osaka University",
+  location: "Osaka, Japan",
+};
+
+const techStack = [
+  "Python",
+  "Golang",
+  "Node.js",
+  "React",
+  "Next.js",
+  "Astro",
+  "TypeScript",
+  "AWS",
+  "GCP",
+];
+
+const hobbies = [
+  {
+    icon: "🌏",
+    title: "Traveling",
+  },
+  {
+    icon: "🥾",
+    title: "Climbing & Hiking",
+  },
+  {
+    icon: "🤖",
+    title: "Machine Learning",
+  },
+  {
+    icon: "📚",
+    title: "Reading tech books",
+  },
+  {
+    icon: "🏃‍♂️",
+    title: "Running & Fitness",
+  },
+  {
+    icon: "🎬",
+    title: "Watching movies",
+  },
+];
+---
+
+<section class="container mx-auto max-w-5xl px-4 flex flex-col gap-0">
+  <!-- Basic Information -->
+  <div class="px-8 pb-8">
+    <h3 class="text-2xl font-bold mb-2 text-center md:text-left">Basic Information</h3>
+    <Line />
+    <div class="flex flex-col md:flex-row items-center gap-12 py-4">
+      <div class="flex-shrink-0">
+        <Image src={IconPath} alt="Profile" class="w-50 h-50 object-cover rounded-full border-4 border-gray-300 shadow-lg" />
+      </div>
+      <div class="flex-1 flex flex-col gap-2 text-xl items-center md:items-start">
+        <ul class="space-y-2">
+          <li class="flex items-baseline"><span class="font-semibold min-w-[8rem] text-right pr-4">Name :</span><span>{profile.name}</span></li>
+          <li class="flex items-baseline"><span class="font-semibold min-w-[8rem] text-right pr-4">Age :</span><span>{profile.age}</span></li>
+          <li class="flex items-baseline"><span class="font-semibold min-w-[8rem] text-right pr-4">Birthday :</span><span>{profile.birthday}</span></li>
+          <li class="flex items-baseline"><span class="font-semibold min-w-[8rem] text-right pr-4">University :</span><span>{profile.university}</span></li>
+          <li class="flex items-baseline"><span class="font-semibold min-w-[8rem] text-right pr-4">Location :</span><span>{profile.location}</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="px-8 pb-8">
+    <h3 class="text-2xl font-bold text-center md:text-left">Tech Stack</h3>
+    <Line />
+    <ul class="flex flex-wrap gap-4 text-lg py-4">
+      {techStack.map((tech) => (
+        <li class="bg-slate-100/70 dark:bg-gray-700/50 text-md md:text-lg px-4 py-2 rounded-full shadow-mdv hover:scale-105 transition-transform duration-200">
+          {tech}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <!-- Hobby -->
+  <div class="px-8 pb-8">
+    <h3 class="text-2xl font-bold text-center md:text-left">Hobby</h3>
+    <Line />
+    <ul class="flex flex-wrap gap-4 justify-center md:justify-start py-6">
+      {hobbies.map(hobby => (
+        <li class="flex items-center gap-3 bg-slate-100/70 dark:bg-gray-700/50 px-5 py-3 rounded-2xl shadow hover:scale-105 transition-transform duration-200 w-72 min-w-72 max-w-72 justify-center">
+          <span class="text-2xl">{hobby.icon}</span>
+          <span class="font-semibold">{hobby.title}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
