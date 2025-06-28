@@ -2,7 +2,9 @@
 import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import { Button } from "@/components/ui/button";
+import QiitaWhiteIcon from "@/assets/qiita-white-icon.png";
 import QiitaIcon from "@/assets/qiita-icon.png";
+import ZennWhiteIcon from "@/assets/zenn-white-icon.svg";
 import ZennIcon from "@/assets/zenn-icon.svg";
 ---
 
@@ -29,10 +31,20 @@ import ZennIcon from "@/assets/zenn-icon.svg";
                     </a>
                 </Button>
                 <a href="https://qiita.com/Katsuya_Ogata" target="_blank" rel="noopener noreferrer">
-                    <Image src={QiitaIcon} alt="Qiita" class="w-5 h-5" />
+                    <span class="block dark:hidden">
+                        <Image src={QiitaIcon} alt="Qiita" class="w-5 h-5" />
+                    </span>
+                    <span class="hidden dark:block">
+                        <Image src={QiitaWhiteIcon} alt="Qiita" class="w-5 h-5" />
+                    </span>
                 </a>
                 <a href="https://qiita.com/Katsuya_Ogata" target="_blank" rel="noopener noreferrer">
-                    <Image src={ZennIcon} alt="Qiita" class="w-5 h-5" />
+                    <span class="block dark:hidden">
+                        <Image src={ZennIcon} alt="Zenn" class="w-5 h-5" />
+                    </span>
+                    <span class="hidden dark:block">
+                        <Image src={ZennWhiteIcon} alt="Zenn" class="w-5 h-5" />
+                    </span>
                 </a>
             </div>
         </div>
