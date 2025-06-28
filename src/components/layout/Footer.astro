@@ -1,0 +1,39 @@
+---
+import { Image } from "astro:assets";
+import { Icon } from "astro-icon/components";
+import { Button } from "@/components/ui/button";
+import QiitaIcon from "@/assets/qiita-icon.png";
+import ZennIcon from "@/assets/zenn-icon.svg";
+---
+
+<footer class="bg-zinc-300 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-8">
+    <div class="container mx-auto px-6 md:px-12">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+            <!-- Left Section: Branding & Tagline -->
+            <div class="text-center md:text-left">
+                <h2 class="text-xl font-semibold">Katsuya Ogata</h2>
+                <p class="text-sm mt-2">Creating innovative solutions for the web.</p>
+            </div>
+
+            <!-- Social Media Links -->
+            <div class="flex gap-6">
+                <Button variant="ghost" size="icon" asChild>
+                    <a href="https://github.com/ogatakatsuya" target="_blank" rel="noopener noreferrer">
+                        <Icon name="ri:github-line" class="w-5 h-5" />
+                    </a>
+                </Button>
+                <Button variant="ghost" size="icon" asChild>
+                    <a href="ogata.1225.koroku@gmail.com" target="_blank" rel="noopener noreferrer">
+                        <Icon name="ri:mail-line" class="w-5 h-5" />
+                    </a>
+                </Button>
+                <a href="https://qiita.com/Katsuya_Ogata" target="_blank" rel="noopener noreferrer">
+                    <Image src={QiitaIcon} alt="Qiita" class="w-5 h-5" />
+                </a>
+                <a href="https://qiita.com/Katsuya_Ogata" target="_blank" rel="noopener noreferrer">
+                    <Image src={ZennIcon} alt="Qiita" class="w-5 h-5" />
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
