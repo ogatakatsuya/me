@@ -1,6 +1,6 @@
 ---
 import { clsx } from "clsx";
-import { Briefcase } from "lucide-react";
+import { Icon } from "astro-icon/components";
 import { Card, CardContent } from "@/components/ui/card";
 
 const experiences = [
@@ -60,7 +60,7 @@ const experiences = [
                     )}>
                         <Card className="shadow-lg text-center">
                             <CardContent className="grid gap-2">
-                                <Briefcase className="text-blue-500 mx-auto" />
+                                <Icon name="ri:briefcase-5-line" class="text-blue-500 mx-auto" />
                                 <h3 class="text-xl font-bold">{exp.title}</h3>
                                 <a class="text-gray-600 hover:underline" target="blank" href={exp.link}>{exp.company}</a>
                                 <span class="text-sm text-gray-500">{exp.year}</span>
@@ -99,7 +99,7 @@ const experiences = [
                     
                     {/* カード */}
                     <Card className="shadow-lg text-center">
-                        <Briefcase className="text-blue-500 mx-auto mb-2" />
+                        <Icon name="ri:briefcase-5-line" class="text-blue-500 mx-auto mb-2" />
                         <h3 class="text-lg font-bold">{exp.title}</h3>
                         <p class="text-gray-600">{exp.company}</p>
                         <span class="text-sm text-gray-500">{exp.year}</span>
