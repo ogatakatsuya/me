@@ -10,7 +10,7 @@ content:
     type: collection
     filename: "{fields.slug}.mdx"
     view:
-      fields: [slug, title, date, theme]
+      fields: [title, slug, date, theme]
       default:
         sort: date
         order: desc
@@ -62,7 +62,7 @@ content:
     type: collection
     filename: "{fields.slug}.mdx"
     view:
-      fields: [slug, title, date]
+      fields: [title, slug, date]
       default:
         sort: date
         order: desc
