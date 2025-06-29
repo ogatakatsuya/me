@@ -79,3 +79,7 @@ content:
           max: 5
           collapsible: false
         required: true
+      - name: body
+        label: Body
+        type: rich-text
+        required: true
