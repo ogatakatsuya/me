@@ -27,13 +27,13 @@ content:
         label: createdAt
         type: date
         options:
-          format: "yyyy-MM-dd"
+          format: "MMM dd, yyyy"
         required: true
       - name: updatedAt
         label: updatedAt
         type: date
         options:
-          format: "yyyy-MM-dd"
+          format: "MMM dd, yyyy"
       - name: tags
         label: Tags
         type: string
@@ -79,13 +79,13 @@ content:
         label: createdAt
         type: date
         options:
-          format: "yyyy-MM-dd"
+          format: "MMM dd, yyyy"
         required: true
       - name: updatedAt
         label: updatedAt
         type: date
         options:
-          format: "yyyy-MM-dd"
+          format: "MMM dd, yyyy"
       - name: summary
         label: Summary
         type: text
