@@ -1,0 +1,59 @@
+---
+import { getCollection } from "astro:content";
+import type { PaginateFunction } from "astro";
+import { COUNT_PER_PAGE } from "@/lib/constant";
+import Layout from "@/layouts/BaseLayout.astro";
+import Pagination from "@/components/ui/Pagination.astro";
+import Title from "@/components/page/Title.astro";
+
+export async function getStaticPaths({
+	paginate,
+}: {
+	paginate: PaginateFunction;
+}) {
+	const allPosts = await getCollection("talk");
+
+	const sortedPosts = allPosts.sort((a, b) => {
+		const aDate = new Date(a.data.date);
+		const bDate = new Date(b.data.date);
+		return bDate.getTime() - aDate.getTime();
+	});
+
+	return paginate(sortedPosts, { pageSize: COUNT_PER_PAGE });
+}
+
+const { page } = Astro.props;
+---
+
+<Layout
+  title="Talk | Ogata Katsuya's Portfolio"
+  description="Talks"
+  pagefind={true}
+  og={{
+    enabled: true,
+    image: new URL("/og-image.png", Astro.url),
+  }}
+  type="website"
+>
+  <Title title="Talk" />
+  <div class="flex flex-col items-center w-full">
+    <article class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-5xl justify-items-center">
+      {page.data.map((talk) => (
+        <div class="w-full max-w-xs flex flex-col h-full min-h-[200px] p-2 shadow-md bg-gradient-to-b from-slate-200 to-slate-300/50 dark:to-slate-700/50 dark:from-slate-800 rounded-xl">
+          <div class="p-0">
+            <div class="p-4">
+              <a href={`/talk/${talk.id}`} class="hover:underline font-medium text-lg">
+                {talk.data.title}
+              </a>
+            </div>
+          </div>
+          <div class="pb-2 px-4 mt-auto">
+            <div class="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">{talk.data.summary}</div>
+            <div class="text-sm text-gray-500 my-2">{talk.data.date.toISOString().split("T")[0]}</div>
+          </div>
+        </div>
+      ))}
+    </article>
+    <Pagination page={page} baseUrl="/talk" />
+  </div>
+</Layout>

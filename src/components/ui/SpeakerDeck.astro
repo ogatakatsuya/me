@@ -1,0 +1,15 @@
+---
+interface Props {
+	deckId: string;
+	ratio: string;
+}
+
+const { deckId, ratio } = Astro.props as Props;
+---
+
+<script 
+  defer class="speakerdeck-embed" 
+  data-id={deckId} 
+  data-ratio={ratio}
+  src="//speakerdeck.com/assets/embed.js"
+/>
