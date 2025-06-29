@@ -24,7 +24,7 @@ const { Content } = await render(post);
         enabled: true,
         width: 1200,
         height: 630,
-        image: new URL(`https://storage.r2.ogatakatsuya.com/${post.id}.png`),
+        image: new URL(`https://storage.r2.ogatakatsuya.com/${post.data.title}.png`, Astro.url),
     }}
     type="article"
 >

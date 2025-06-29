@@ -13,7 +13,6 @@ export async function getStaticPaths() {
 }
 
 const talk: CollectionEntry<"talk"> = Astro.props;
-const { Content } = await render(talk);
 ---
 
 <Layout
@@ -24,7 +23,7 @@ const { Content } = await render(talk);
     enabled: true,
     width: 1200,
     height: 630,
-    image: new URL(`https://storage.r2.ogatakatsuya.com/${talk.data.title}.png`),
+    image: new URL(`https://storage.r2.ogatakatsuya.com/${talk.id}.png`, Astro.url),
   }}
   type="article"
 >
@@ -47,6 +46,18 @@ const { Content } = await render(talk);
                 })}
               </time>
             </div>
+            {talk.data.tags && talk.data.tags.length > 0 && (
+                <div class="flex items-center">
+                    <span class="mr-2">🏷️</span>
+                    <div class="flex flex-wrap gap-2">
+                        {talk.data.tags.map((tag: string) => (
+                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
           </div>
           {talk.data.summary && (
             <div class="text-md md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed border-l-4 border-blue-500 pl-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-r-lg">
