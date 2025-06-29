@@ -6,17 +6,17 @@ import { Image } from "astro:assets";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface Props {
-	page: Page<CollectionEntry<"blog">>;
+	page: Page<CollectionEntry<"blog" | "talk">>;
 }
 const { page } = Astro.props;
 ---
 
 <article class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-5xl justify-items-center">
-  {page.data.map((post: CollectionEntry<'blog'>) => (
+  {page.data.map((post) => (
     <Card className="w-full max-w-xs flex flex-col h-full min-h-[200px] p-2 shadow-md bg-gradient-to-b from-slate-200 to-slate-300/50 dark:to-slate-700/50 dark:from-slate-800">
       <CardHeader className="p-0">
         <Image
-          src={`https://storage.r2.ogatakatsuya.com/${post.data.title}.png`}
+          src={`https://storage.r2.ogatakatsuya.com/${post.id}.png`}
           alt={post.data.title}
           width="1200"
           height="630"
