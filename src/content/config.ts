@@ -6,7 +6,8 @@ const blog = defineCollection({
 	schema: z.object({
 		slug: z.string(),
 		title: z.string(),
-		date: z.coerce.date(),
+		createdAt: z.coerce.date(),
+		updatedAt: z.coerce.date().optional(),
 		tags: z.array(z.string()),
 		summary: z.string(),
 		theme: z
@@ -20,7 +21,8 @@ const talk = defineCollection({
 	schema: z.object({
 		slug: z.string(),
 		title: z.string(),
-		date: z.coerce.date(),
+		createdAt: z.coerce.date(),
+		updatedAt: z.coerce.date().optional(),
 		summary: z.string(),
 		tags: z.array(z.string()),
 	}),

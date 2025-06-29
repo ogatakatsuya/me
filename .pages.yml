@@ -34,7 +34,6 @@ content:
         type: date
         options:
           format: "yyyy-MM-dd"
-        required: true
       - name: tags
         label: Tags
         type: string
@@ -87,7 +86,6 @@ content:
         type: date
         options:
           format: "yyyy-MM-dd"
-        required: true
       - name: summary
         label: Summary
         type: text
