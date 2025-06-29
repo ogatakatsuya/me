@@ -6,3 +6,4 @@ tags:
 summary: test pages cms
 theme: info
 ---
+# Pages CMSを用いてブラウザ上から記事を作ってみる
