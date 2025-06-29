@@ -1,0 +1,67 @@
+media:
+  input: public/assets/images
+  output: /assets/images
+  categories:
+    - image
+content:
+  - name: blog
+    label: Blog
+    path: src/content/blog
+    type: collection
+    view:
+      fields: [title, date, theme]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+      - name: date
+        label: Date
+        type: date
+        options:
+          format: "yyyy-MM-dd"
+      - name: tags
+        label: Tags
+        type: string
+        list:
+          min: 1
+          max: 5
+          collapsible: false
+      - name: summary
+        label: Summary
+        type: text
+      - name: theme
+        label: Theme
+        type: select
+        options:
+          values: [tech, info, diary, idea, default]
+  - name: talk
+    label: Talk
+    path: src/content/talk
+    type: collection
+    view:
+      fields: [title, date]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+      - name: date
+        label: Date
+        type: date
+        options:
+          format: "yyyy-MM-dd"
+      - name: summary
+        label: Summary
+        type: text
+      - name: tags
+        label: Tags
+        type: string
+        list:
+          min: 1
+          max: 5
+          collapsible: false
