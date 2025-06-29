@@ -24,13 +24,13 @@ content:
         type: string
         required: true
       - name: createdAt
-        label: Date
+        label: createdAt
         type: date
         options:
           format: "yyyy-MM-dd"
         required: true
       - name: updatedAt
-        label: Date
+        label: updatedAt
         type: date
         options:
           format: "yyyy-MM-dd"
@@ -76,13 +76,13 @@ content:
         type: string
         required: true
       - name: createdAt
-        label: Date
+        label: createdAt
         type: date
         options:
           format: "yyyy-MM-dd"
         required: true
       - name: updatedAt
-        label: Date
+        label: updatedAt
         type: date
         options:
           format: "yyyy-MM-dd"
