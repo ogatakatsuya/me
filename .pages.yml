@@ -8,9 +8,9 @@ content:
     label: Blog
     path: src/content/blog
     type: collection
-    filename: "{primary}.mdx"
+    fileName: "{fields.slug}.mdx"
     view:
-      fields: [fileName, title, date, theme]
+      fields: [slug, title, date, theme]
       default:
         sort: date
         order: desc
@@ -19,11 +19,17 @@ content:
         label: Title
         type: string
         required: true
-      - name: fileName
-        label: FileName
+      - name: slug
+        label: slug
         type: string
         required: true
-      - name: date
+      - name: createdAt
+        label: Date
+        type: date
+        options:
+          format: "yyyy-MM-dd"
+        required: true
+      - name: updatedAt
         label: Date
         type: date
         options:
@@ -55,9 +61,9 @@ content:
     label: Talk
     path: src/content/talk
     type: collection
-    filename: "{primary}.mdx"
+    fileName: "{fields.slug}.mdx"
     view:
-      fields: [fileName, title, date]
+      fields: [slug, title, date]
       default:
         sort: date
         order: desc
@@ -66,11 +72,17 @@ content:
         label: Title
         type: string
         required: true
-      - name: fileName
-        label: FileName
+      - name: slug
+        label: slug
         type: string
         required: true
-      - name: date
+      - name: createdAt
+        label: Date
+        type: date
+        options:
+          format: "yyyy-MM-dd"
+        required: true
+      - name: updatedAt
         label: Date
         type: date
         options:
