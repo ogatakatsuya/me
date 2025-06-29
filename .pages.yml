@@ -17,11 +17,13 @@ content:
       - name: title
         label: Title
         type: string
+        required: true
       - name: date
         label: Date
         type: date
         options:
           format: "yyyy-MM-dd"
+        required: true
       - name: tags
         label: Tags
         type: string
@@ -29,14 +31,21 @@ content:
           min: 1
           max: 5
           collapsible: false
+        required: true
       - name: summary
         label: Summary
         type: text
+        required: true
       - name: theme
         label: Theme
         type: select
         options:
           values: [tech, info, diary, idea, default]
+        required: true
+      - name: body
+        label: Body
+        type: rich-text
+        required: true
   - name: talk
     label: Talk
     path: src/content/talk
@@ -50,11 +59,13 @@ content:
       - name: title
         label: Title
         type: string
+        required: true
       - name: date
         label: Date
         type: date
         options:
           format: "yyyy-MM-dd"
+        required: true
       - name: summary
         label: Summary
         type: text
@@ -65,3 +76,4 @@ content:
           min: 1
           max: 5
           collapsible: false
+        required: true
