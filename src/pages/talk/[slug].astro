@@ -37,14 +37,24 @@ const talk: CollectionEntry<"talk"> = Astro.props;
           </h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
             <div class="flex items-center">
-              <span class="mr-2">📅</span>
-              <time datetime={talk.data.date.toISOString()}>
-                {talk.data.date.toLocaleDateString('ja-JP', {
+              <span class="mr-2">created at:</span>
+              <time datetime={talk.data.createdAt.toISOString()}>
+                {talk.data.createdAt.toLocaleDateString('ja-JP', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
                 })}
               </time>
+              { talk.data.updatedAt && (
+                <span class="mr-2">updated at:</span>
+                <time datetime={talk.data.updatedAt.toISOString()}>
+                  {talk.data.updatedAt.toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+              )}
             </div>
             {talk.data.tags && talk.data.tags.length > 0 && (
                 <div class="flex items-center">
