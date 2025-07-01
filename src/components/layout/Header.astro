@@ -12,10 +12,7 @@ const navLinks = [
 <header class="fixed w-full top-8 z-50 flex justify-center pointer-events-none">
   <div class="bg-slate-200 dark:bg-gray-900/80 border-2 border-gray-400 dark:border-yellow-100 rounded-xl shadow-md px-2 py-3 md:py-4 w-[95vw] max-w-3xl pointer-events-auto transition-colors duration-300">
     <nav class="relative flex items-center justify-center">
-      <div class="absolute right-2 top-1/2 -translate-y-1/2">
-        <ThemeIcon />
-      </div>
-      <div class="flex gap-6 justify-center w-full">
+      <div class="flex gap-6 justify-left pl-8 md:justify-center w-full">
         {navLinks.map(link => (
           <a
             href={link.href}
@@ -24,6 +21,9 @@ const navLinks = [
             {link.label}
           </a>
         ))}
+      </div>
+      <div class="absolute right-2 top-1/2 -translate-y-1/2">
+        <ThemeIcon />
       </div>
     </nav>
   </div>
