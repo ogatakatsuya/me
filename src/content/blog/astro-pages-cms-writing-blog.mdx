@@ -10,10 +10,137 @@ theme: tech
 ---
 # 概要
 
+開発者の方の自作ブログはたいてい、Markdownを用いてGitHubをベースとして管理されている方が多いと思います。
+
+すると、必然的にPCを起動して、エディタで執筆をされる方が多いと思われますが、ふと携帯で記事を作成したいと思う時があると思います。
+
+そこで、GitHubをベースとしたCMSを作れば良いじゃないか！！と思ったらすでにありました。。。
+
+この記事では、PagesCMSを用いてブラウザ上から記事を執筆できるようにする方法を解説します。
+
 # PagesCMSとは
+
+[https://pagescms.org/](https://pagescms.org/)
+
+概要にも書きましたが、GitHubベースで記事を管理することのできるツールです。
+
+最初にGitHubの認証を行い、レポジトリのRead/Write権限を付与することで、PagesCMS上で執筆したMarkdown記事を指定したパスにpushしてくれます。あとは自前で用意したGitHub Actions等の自動デプロイが走って、記事が表示されるようになるといった仕組みです。
+
+Frontmatterのフィールドをあらかじめ指定して、フォーム形式で表示してくれたり、画像などの静的コンテンツも管理することができるのでとても便利なツールです。
 
 # 導入手順
 
-# 動作確認
+まず、PagesCMSのサイトにアクセスして認証を行います( [https://pagescms.org/](https://pagescms.org/) )。
+
+その後、設定ファイル(.pages.yml)の作成を行なっていきます。すべてブラウザ上で設定を書くことができ、作成・編集後は自動でpushされます。(この作業のGUIでできたらいいのに。。)
+
+設定ファイルの書き方はすべてドキュメントに書いてあるのですが、日本語のドキュメントはなかったので、ここに書き方をまとめておきます。
+
+まず、mediaでは画像などの静的コンテンツをどこに配置するかを設定します。
+
+今回は画像のみを配置予定なので、categoriesはimageのみにしています。パスは好みに応じて調整して下さい。
+
+```yaml
+media:
+  input: public/assets/images
+  output: /
+  categories:
+    - image
+```
+
+次は、markdownについての設定をcontentに書いていきます。
+
+私は、blogとtalkの2つをmarkdownで管理しているので、2つ書いていきます。
+
+*   name: 必須。識別のための一意な名前。
+    
+*   label: PagesCMS上で表示される名前。
+    
+*   path: markdownがあるrootからのパス。
+    
+*   type: パス以下に複数のファイルがある場合は\`collection\`で単体の場合は\`file\`。
+    
+*   filename: PagesCMSで執筆したときに生成されるファイル名。デフォルトでは\`'{year}-{month}-{day}-{primary}.md'\`となる。\`{primary}\`は後述するviewの最初の要素を指す。
+    
+*   view: PagesCMSの管理画面で表示される要素。
+    
+*   fields: Markdown内のFrontmatter。フォームで入力できるようにするための設定。
+    
+    *   name: markdownに記述される名前。
+        
+    *   label: PagesCMSのフォームのラベル名。
+        
+    *   required: 必須or任意
+        
+
+fieldsはフォームの種類に応じで書き方が異なるので、ドキュメントを要参照です。
+
+基本的なフォームは全て揃っているのでとても楽にFrontmatterを設定することができます。
+
+ですが、ここを間違えるとビルドされなかったり、Frontmatterのスキーマを変更すると、こちらのyamlファイルも編集する必要があるので、二重管理になって少し面倒です(誰かyaml自動生成ツール作って。。。)
+
+```yaml
+content:
+  - name: blog
+    label: Blog
+    path: src/content/blog
+    type: collection
+    filename: "{fields.slug}.mdx"
+    view:
+      fields: [title, slug, date, theme]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: slug
+        label: slug
+        type: string
+        required: true
+      - name: createdAt
+        label: createdAt
+        type: date
+        options:
+          format: "MMM dd, yyyy"
+        required: true
+      - name: updatedAt
+        label: updatedAt
+        type: date
+        options:
+          format: "MMM dd, yyyy"
+      - name: tags
+        label: Tags
+        type: string
+        list:
+          min: 1
+          max: 5
+          collapsible: false
+        required: true
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+      - name: theme
+        label: Theme
+        type: select
+        options:
+          values: [tech, info, diary, idea, default]
+        required: true
+      - name: body
+        label: Body
+        type: rich-text
+        required: true
+.....
+```
 
 # まとめ
+
+今回は、Markdownベースのブログと相性の良い、PagesCMSをAstroに導入する方法を解説しました。
+
+特にAstro要素はなく、Markdownでブログを書いているなら相性は良いと思います。
+
+ブログサイトを作成することよりも、ブログを執筆し続ける方が困難なので、より快適に記事を作成できる環境を整えることは重要です。
+
+また、エンジニア以外でもブログを執筆できるようになるため、ビジネスサイドも関わるプロジェクトとも親和性が高いなぁと感じました。
+
+以上。
