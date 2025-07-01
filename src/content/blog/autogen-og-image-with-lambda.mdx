@@ -9,6 +9,9 @@ tags:
 summary: Astroで新しい記事が作成されたときにOG画像を自動で生成してくれる仕組みの作り方を解説します。
 theme: tech
 ---
+import { Image } from 'astro:assets';
+import image0 from '../../assets/blog/lambda-og-gen-arch.png';
+
 # 概要
 
 僕がウェブサイトを立ち上げるとき、最も気を遣う中の1つの要素がOG画像です。最初にmetaタグに画像を埋め込んで、Slackで送ったときに画像が出てきた時の興奮を今も覚えています。
@@ -27,6 +30,8 @@ theme: tech
     
 
 です。単純な興味です。
+
+<Image src={image0} alt="OG画像生成のアーキテクチャ" width={800} height={400} />
 
 この構成のOG画像生成フローは以下です。
 
