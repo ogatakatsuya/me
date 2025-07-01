@@ -10,3 +10,293 @@ summary: Astroで新しい記事が作成されたときにOG画像を自動で�
 theme: tech
 ---
 # 概要
+
+僕がウェブサイトを立ち上げるとき、最も気を遣う中の1つの要素がOG画像です。最初にmetaタグに画像を埋め込んで、Slackで送ったときに画像が出てきた時の興奮を今も覚えています。
+
+今回は、Astroでブログ記事を作成したときに、自動でOG画像が生成される仕組みを作ったので、その解説を行いたいと思います。
+
+# 構成
+
+よくある構成は、Cloudflare Functionか\`@vercel/og\`を使う方法だと思うのですが、今回は、AWS Lambdaで\`canvas\`を用いてOG画像を生成し、それをCloudflare R2にアップロードして使う方法を紹介します。
+
+この構成を採用した理由は、
+
+*   AWS Lambdaに慣れていたため
+    
+*   Cloudflare R2を使いたかったため
+    
+
+です。単純な興味です。
+
+この構成のOG画像生成フローは以下です。
+
+1.  GitHub Actionsを用いて、特定のパス以下の更新を検知
+    
+2.  Lambdaの引数としてFrontmatterを加えてInvokeするスクリプトを実行
+    
+3.  LambdaがOG画像を生成してR2に保存
+    
+
+1から順を追って説明します。
+
+# 実装詳細
+
+## 1\. 変更を検知するワークフロー
+
+なんとも便利なactionsがあったのでこれを使用させていただきました。
+
+たったこれだけで、特定のパスの更新を検知してくれます。
+
+作成、編集は検知して、削除されたファイルパスは出力しないので、今回のユースケースにぴったりです。
+
+また、更新されたファイルの有無を表すフラグがあるので、これが存在する時だけスクリプトを実行します。パスは、環境変数としてスクリプトに渡されます。
+
+```yaml
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            src/content/blog/**.mdx
+      ......
+
+      - name: Request OGP Image Generation
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          pnpm exec tsx scripts/invokeLambda.ts
+```
+
+## 2\. スクリプトを実行してLambdaをInvoke
+
+作成したスクリプトの全文です。
+
+処理としてはシンプルで、先ほどのactionsから更新されたパスを取得して、そのパスを元に、markdownファイルを読みにいき、Frontmatterを取得します。
+
+その中から必要な情報(今回の場合、Title, Tags, Theme)を引数に格納してInvokeします。
+
+```typescript
+import fs from 'fs';
+import matter from 'gray-matter';
+
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+
+type ExtractedMetadata = {
+  title: string;
+  tags: string[];
+  theme: string;
+}
+
+async function processFile(filePath: string): Promise<void> {
+    console.log(`Processing: ${filePath}`);
+    const metadata = extractMetadata(filePath);
+    if (!metadata) {
+      console.error(`[error] ${filePath} has no title or tags`);
+      return;
+    }
+
+    const lambdaClient = new LambdaClient({});
+    const invokeParams = {
+      FunctionName: 'ogp-generator',
+      InvocationType: 'RequestResponse' as const,
+      Payload: JSON.stringify({
+        title: metadata.title,
+        tags: metadata.tags,
+        theme: metadata.theme
+      }),
+    };
+
+    const response = await lambdaClient.send(new InvokeCommand(invokeParams));
+    console.log(`Lambda response for ${filePath}:`, response);
+}
+
+function extractMetadata(filePath: string): ExtractedMetadata | undefined {
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+
+    const { data } = matter(fileContent);
+    const frontmatter = data as ExtractedMetadata;
+
+    if(!frontmatter.title || !frontmatter.tags) {
+      throw new Error(`[error] ${filePath} has no title or tags`);
+    }
+
+    return frontmatter;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function main() {
+  const changedFiles = process.env.CHANGED_FILES?.split(" ") || [];
+
+  if (changedFiles.length === 0) {
+    console.log("No changed MDX files to process.");
+    return;
+  }
+
+  // 変更があったファイルそれぞれに対して処理を実行
+  for (const file of changedFiles) {
+    await processFile(file);
+  }
+}
+
+main();
+```
+
+## 3\. OG画像を生成してR2に格納
+
+OG画像生成部分のスクリプトが以下です。
+
+ぱっと見何をしているかわかりづらいですが、フォントを読み込んだり、細かなデザインの調整を行っているだけで、基本的には、ベースとなるOG画像にタイトルとタグを埋め込んでいるだけです。
+
+最後に、生成された画像を返却します。
+
+```typescript
+import fs from 'fs'
+import path from 'path'
+import { createCanvas, registerFont, loadImage } from 'canvas'
+import { size, wrapText, getImagePath } from './lib'
+import { Theme } from './type'
+
+const current = process.cwd()
+
+export const generateOgImage = async (title: string, tags?: string[], theme?: Theme): Promise<Buffer> => {
+  const font = path.resolve(current, 'assets/font/NotoSansJP-Bold.ttf')
+  registerFont(font, { family: 'NotoSansJP' })
+
+  const { width, height } = size
+  const canvas = createCanvas(width, height)
+  const ctx = canvas.getContext('2d')
+
+  const imagePath = getImagePath(theme)
+  const src = path.resolve(current, imagePath)
+  const image = await loadImage(fs.readFileSync(src))
+
+  ctx.drawImage(image, 0, 0, width, height)
+
+  ctx.font = '50px "NotoSansJP"'
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#000000'
+
+  const maxWidth = 900
+  const startX = 80
+  const startY = 150
+
+  let lines: string[] = []
+  for (const rawLine of title.replace('\\n', '\n').split('\n')) {
+    lines.push(...wrapText(ctx, rawLine))
+  }
+  const sum = lines.length
+  const lineHeight = 100
+  const write = (text: string, i: number) => {
+    const h = startY + i * lineHeight
+    ctx.fillText(text, startX, h, maxWidth)
+  }
+
+  if (sum === 0 || sum > 4) {
+    throw new Error(`Invalid lines: ${sum}`)
+  }
+
+  lines.forEach((line, i) => {
+    write(line, i)
+  })
+
+  if (tags && tags.length > 0) {
+    ctx.font = '32px "NotoSansJP"'
+    ctx.textAlign = 'left'
+    ctx.fillStyle = '#07090a'
+
+    const tagY = height - 80
+    let tagX = 80
+    const tagGap = 20
+
+    for (const tag of tags) {
+      const tagText = `#${tag}`
+      ctx.fillText(tagText, tagX, tagY)
+      const tagWidth = ctx.measureText(tagText).width
+      tagX += tagWidth + tagGap
+    }
+  }
+
+  return canvas.toBuffer('image/png')
+}
+```
+
+次にR2へのアップロード部分です。
+
+いくつか方法はありますが、R2はS3互換のストレージなので、s3用のSDKを使用します。
+
+```typescript
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+
+export const uploadToR2 = async (file: Buffer, bucketName: string, fileName: string): Promise<string | undefined> => {
+  try {
+    const s3 = new S3Client({
+      region: "auto",
+      endpoint: process.env.R2_ENDPOINT!,
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY!,
+        secretAccessKey: process.env.R2_SECRET_KEY!,
+      },
+    });
+    
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: fileName + '.png',
+        ContentType: 'image/png',
+        Body: file,
+        ACL: "public-read",
+      })
+    );
+
+    const uploadedUrl = `https://${process.env.R2_CUSTOM_DOMAIN}/${fileName}.png`;
+
+    return uploadedUrl;
+  } catch (error) {
+    throw new Error(`Failed to upload file to R2: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+};
+```
+
+これでOG画像が生成されるフローができました！
+
+# Lambdaのデプロイ
+
+AWSから提供されているDocker imageをbaseにして構築します。
+
+マルチステージビルドをしていますが、そんなにサイズは変わらなかったです。
+
+```dockerfile
+FROM public.ecr.aws/lambda/nodejs:22 AS base
+
+WORKDIR /usr/app
+
+COPY package.json package-lock.json ./
+COPY src ./src
+COPY assets ./assets
+
+RUN npm install
+RUN npm run build
+
+FROM public.ecr.aws/lambda/nodejs:22
+
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+COPY --from=base /usr/app/dist/* ./
+COPY --from=base /usr/app/node_modules ./node_modules
+COPY --from=base /usr/app/assets ./assets
+
+CMD ["dist/app.handler"]
+```
+
+# まとめ
+
+OG画像をLambdaを用いて生成する方法を解説しました。
+
+やはり独自ウェブサイトでOG画像ができるとテンションが上がりますね。
+
+自分でFigmaでデザインしましたが、結果的にZennのパクリみたいになってしまいました。許して下さい。
