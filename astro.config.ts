@@ -10,6 +10,7 @@ import expressiveCode from 'astro-expressive-code';
 import icon from 'astro-icon';
 
 import partytown from '@astrojs/partytown';
+import remarkLinkCard from 'remark-link-card-plus';
 
 // https://astro.build/config
 export default defineConfig({
@@ -32,10 +33,21 @@ export default defineConfig({
       },
     })
   ],
-    image: {
-      remotePatterns: [{
-        protocol: 'https',
-        hostname: 'storage.r2.ogatakatsuya.com',
-      }],
-    }
+  markdown: {
+    remarkPlugins: [
+      [
+        remarkLinkCard, {
+          cache: true,
+          shortenUrl: true,
+          thumbnailPosition: "right",
+        },
+      ],
+    ],
+  },
+  image: {
+    remotePatterns: [{
+      protocol: 'https',
+      hostname: 'storage.r2.ogatakatsuya.com',
+    }],
+  }
 });
