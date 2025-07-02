@@ -50,7 +50,7 @@ content:
         label: Theme
         type: select
         options:
-          values: [tech, info, diary, idea, default]
+          values: [green, blue, beige, gray, brown]
         required: true
       - name: body
         label: Body
