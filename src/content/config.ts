@@ -11,8 +11,7 @@ const blog = defineCollection({
 		tags: z.array(z.string()),
 		summary: z.string(),
 		theme: z
-			.enum(["tech", "idea", "diary", "info", "default"])
-			.default("default"),
+			.enum(["green", "blue", "gray", "beige", "brown"])
 	}),
 });
 
