@@ -9,7 +9,8 @@ tags:
 summary: Astroで新しい記事が作成されたときにOG画像を自動で生成してくれる仕組みの作り方を解説します。
 theme: gray
 ---
-import { Image } from 'astro:assets'; import image0 from '../../assets/blog/lambda-og-gen-arch.png';
+import { Image } from 'astro:assets'; 
+import image0 from '../../assets/blog/lambda-og-gen-arch.png';
 
 # 概要
 
@@ -30,7 +31,7 @@ import { Image } from 'astro:assets'; import image0 from '../../assets/blog/lamb
 
 です。単純な興味です。
 
-<img src="{image0}" alt="OG画像生成のアーキテクチャ" width="{800}" height="{400}">
+<Image src={image0} alt="OG画像生成のアーキテクチャ" width="{800}" height="{400}"/>
 
 この構成のOG画像生成フローは以下です。
 
