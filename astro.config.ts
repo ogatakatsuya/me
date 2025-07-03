@@ -12,27 +12,33 @@ import icon from 'astro-icon';
 import partytown from '@astrojs/partytown';
 import remarkLinkCard from 'remark-link-card-plus';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://www.ogatakatsuya.com',
-    vite: {
-        plugins: [tailwindcss()],
+  site: 'https://www.ogatakatsuya.com',
+  output: 'static',
+
+  vite: {
+      plugins: [tailwindcss()],
+  },
+
+  integrations: [react(), sitemap(), expressiveCode({
+    defaultProps: {
+      wrap: false,
+      preserveIndent: true,
     },
-    integrations: [react(), sitemap(), expressiveCode({
-      defaultProps: {
-        wrap: false,
-        preserveIndent: true,
-      },
-      themes: ['everforest-dark', 'everforest-light'],
-    }), 
-    mdx(), 
-    icon(), 
-    partytown({
-      config: {
-        forward: ["dataLayer.push"],
-      },
-    })
-  ],
+    themes: ['everforest-dark', 'everforest-light'],
+  }), 
+  mdx(), 
+  icon(), 
+  partytown({
+    config: {
+      forward: ["dataLayer.push"],
+    },
+  })
+],
+
   markdown: {
     remarkPlugins: [
       [
@@ -44,10 +50,15 @@ export default defineConfig({
       ],
     ],
   },
+
   image: {
     remotePatterns: [{
       protocol: 'https',
       hostname: 'storage.r2.ogatakatsuya.com',
     }],
-  }
+  },
+
+  adapter: cloudflare({
+     imageService: 'cloudflare'
+  }),
 });

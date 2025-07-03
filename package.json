@@ -10,6 +10,7 @@
     "format": "biome format --write ./src"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.6.0",
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/partytown": "^2.1.4",
     "@astrojs/react": "^4.2.2",
