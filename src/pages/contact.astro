@@ -1,38 +1,47 @@
 ---
+export const prerender = false;
+
 import Layout from "@/layouts/BaseLayout.astro";
 import Title from "@/components/page/Title.astro";
 import { Icon } from "astro-icon/components";
+import { contactFormSchema } from "@/lib/schemas";
 
-// SSRでPOSTリクエストを処理
 if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
-    const name = formData.get("name")?.toString();
-    const email = formData.get("email")?.toString();
-    const subject = formData.get("subject")?.toString();
-    const message = formData.get("message")?.toString();
+	try {
+		const formData = await Astro.request.formData();
+		const data = {
+			name: formData.get("name")?.toString(),
+			email: formData.get("email")?.toString(),
+			subject: formData.get("subject")?.toString(),
+			message: formData.get("message")?.toString(),
+		};
 
-    // Validation
-    if (!name || !email || !subject || !message) {
-      return new Response("Please fill in all fields", { status: 400 });
-    }
+		// Zod validation
+		const validationResult = contactFormSchema.safeParse(data);
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return new Response("Please enter a valid email address", { status: 400 });
-    }
+		if (!validationResult.success) {
+			const errors = validationResult.error.errors;
+			const errorMessage = errors
+				.map((err: { message: string }) => err.message)
+				.join(", ");
+			return new Response(errorMessage, { status: 400 });
+		}
 
-    // Here you would implement actual email sending or database storage
-    // Example: email service or database storage
-    console.log("Contact form submitted:", { name, email, subject, message });
+		const validatedData = validationResult.data;
 
-    // Success response
-    return new Response("Thank you for your message. I'll get back to you soon!", { status: 200 });
-  } catch (error) {
-    console.error("Form submission error:", error);
-    return new Response("An error occurred while sending", { status: 500 });
-  }
+		// Here you would implement actual email sending or database storage
+		// Example: email service or database storage
+		console.log("Contact form submitted:", validatedData);
+
+		// Success response
+		return new Response(
+			"Thank you for your message. I'll get back to you soon!",
+			{ status: 200 },
+		);
+	} catch (error) {
+		console.error("Form submission error:", error);
+		return new Response("An error occurred while sending", { status: 500 });
+	}
 }
 ---
 
@@ -49,10 +58,9 @@ if (Astro.request.method === "POST") {
   <Title title="Contact" />
 
   <div class="text-center mb-8">
-    <p class="text-gray-600 dark:text-gray-300">
+    <p class="text-xl text-gray-600 dark:text-gray-300">
       I'd love to hear from you! <br>
-      Whether you have a project in mind, job opportunities,<br/>
-      or just want to chat, feel free to reach out using the form below.
+      Feel free to reach out using the form below.
     </p>
   </div>
   
@@ -61,7 +69,7 @@ if (Astro.request.method === "POST") {
       <!-- お問い合わせフォーム -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg px-16 py-8 border border-gray-200 dark:border-gray-700">
 
-        <form method="POST" class="space-y-6" id="contact-form">
+        <form method="POST" class="space-y-6" id="contact-form" novalidate>
           <!-- Name -->
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -71,10 +79,10 @@ if (Astro.request.method === "POST") {
               type="text"
               id="name"
               name="name"
-              required
               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200"
               placeholder="John Doe"
             />
+            <div id="name-error" class="text-red-500 text-sm mt-1 hidden"></div>
           </div>
 
           <!-- Email Address -->
@@ -83,13 +91,13 @@ if (Astro.request.method === "POST") {
               Email Address <span class="text-red-500">*</span>
             </label>
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
-              required
               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200"
               placeholder="example@email.com"
             />
+            <div id="email-error" class="text-red-500 text-sm mt-1 hidden"></div>
           </div>
 
           <!-- Subject -->
@@ -101,10 +109,10 @@ if (Astro.request.method === "POST") {
               type="text"
               id="subject"
               name="subject"
-              required
               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200"
               placeholder="Subject of your inquiry"
             />
+            <div id="subject-error" class="text-red-500 text-sm mt-1 hidden"></div>
           </div>
 
           <!-- Message -->
@@ -116,10 +124,10 @@ if (Astro.request.method === "POST") {
               id="message"
               name="message"
               rows="6"
-              required
               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200 resize-none"
               placeholder="Tell me about your project or inquiry..."
             ></textarea>
+            <div id="message-error" class="text-red-500 text-sm mt-1 hidden"></div>
           </div>
 
           <!-- Submit Button -->
@@ -133,30 +141,6 @@ if (Astro.request.method === "POST") {
             </button>
           </div>
         </form>
-
-        <!-- Direct Contact -->
-        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">Direct Contact</h3>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a 
-              href="mailto:ogata.1225.koroku@gmail.com"
-              class="flex items-center gap-2 text-blue-600 dark:text-yellow-400 hover:underline transition-colors duration-200"
-            >
-              <Icon name="ri:mail-line" class="w-5 h-5" />
-              ogata.1225.koroku@gmail.com
-            </a>
-            <a 
-              href="https://github.com/ogatakatsuya"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center gap-2 text-blue-600 dark:text-yellow-400 hover:underline transition-colors duration-200"
-            >
-              <Icon name="ri:github-line" class="w-5 h-5" />
-              GitHub
-            </a>
-          </div>
-        </div>
-      </div>
 
       <!-- Success and Error Messages -->
       <div id="message-container" class="mt-6 hidden">
@@ -177,58 +161,181 @@ if (Astro.request.method === "POST") {
   </main>
 
   <script>
-    // Form submission handling
-    document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // Validation functions
+    const validators = {
+      name: (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return 'Name is required';
+        if (trimmed.length < 2) return 'Name must be at least 2 characters';
+        if (trimmed.length > 100) return 'Name must be less than 100 characters';
+        return null;
+      },
       
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
-      const button = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-      const messageContainer = document.getElementById('message-container');
-      const successMessage = document.getElementById('success-message');
-      const errorMessage = document.getElementById('error-message');
-      const errorText = document.getElementById('error-text');
+      email: (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return 'Email is required';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'Please enter a valid email address';
+        if (trimmed.length > 255) return 'Email must be less than 255 characters';
+        return null;
+      },
       
-      // Disable button
-      if (button) {
-        button.disabled = true;
-        button.textContent = 'Sending...';
+      subject: (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return 'Subject is required';
+        if (trimmed.length < 3) return 'Subject must be at least 3 characters';
+        if (trimmed.length > 200) return 'Subject must be less than 200 characters';
+        return null;
+      },
+      
+      message: (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return 'Message is required';
+        if (trimmed.length < 10) return 'Message must be at least 10 characters';
+        if (trimmed.length > 2000) return 'Message must be less than 2000 characters';
+        return null;
       }
+    };
+
+    // Show/hide field error
+    function showFieldError(fieldName: string, error: string | null) {
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      const inputElement = document.getElementById(fieldName) as HTMLInputElement | HTMLTextAreaElement;
       
-      // Reset messages
-      messageContainer?.classList.add('hidden');
-      successMessage?.classList.add('hidden');
-      errorMessage?.classList.add('hidden');
+      if (error && errorElement && inputElement) {
+        errorElement.textContent = error;
+        errorElement.classList.remove('hidden');
+        inputElement.classList.add('border-red-500', 'focus:ring-red-500');
+        inputElement.classList.remove('border-gray-300', 'dark:border-gray-600', 'focus:ring-blue-500', 'dark:focus:ring-yellow-400');
+      } else if (errorElement && inputElement) {
+        errorElement.classList.add('hidden');
+        inputElement.classList.remove('border-red-500', 'focus:ring-red-500');
+        inputElement.classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-blue-500', 'dark:focus:ring-yellow-400');
+      }
+    }
+
+    // Validate single field
+    function validateField(fieldName: keyof typeof validators, value: string) {
+      const error = validators[fieldName](value);
+      showFieldError(fieldName, error);
+      return !error;
+    }
+
+    // Validate all fields
+    function validateForm(data: Record<string, string>) {
+      let isValid = true;
       
-      try {
-        const response = await fetch('/contact', {
-          method: 'POST',
-          body: formData
+      (Object.keys(validators) as Array<keyof typeof validators>).forEach(fieldName => {
+        const fieldValid = validateField(fieldName, data[fieldName] || '');
+        if (!fieldValid) isValid = false;
+      });
+      
+      return isValid;
+    }
+
+    // Setup real-time validation
+    function setupRealtimeValidation() {
+      (['name', 'email', 'subject', 'message'] as Array<keyof typeof validators>).forEach(fieldName => {
+        const element = document.getElementById(fieldName) as HTMLInputElement | HTMLTextAreaElement;
+        if (element) {
+          // Validate on blur (when user leaves the field)
+          element.addEventListener('blur', () => {
+            validateField(fieldName, element.value);
+          });
+          
+          // Clear error on input (when user starts typing)
+          element.addEventListener('input', () => {
+            const errorElement = document.getElementById(`${fieldName}-error`);
+            if (errorElement && !errorElement.classList.contains('hidden')) {
+              // Only validate if there was an error before
+              setTimeout(() => validateField(fieldName, element.value), 500);
+            }
+          });
+        }
+      });
+    }
+
+    // Form submission handling
+    document.addEventListener('DOMContentLoaded', () => {
+      setupRealtimeValidation();
+      
+      const form = document.getElementById('contact-form') as HTMLFormElement;
+      if (form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const formData = new FormData(form);
+          const button = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+          const messageContainer = document.getElementById('message-container');
+          const successMessage = document.getElementById('success-message');
+          const errorMessage = document.getElementById('error-message');
+          const errorText = document.getElementById('error-text');
+          
+          // Collect form data
+          const data = {
+            name: formData.get('name')?.toString() || '',
+            email: formData.get('email')?.toString() || '',
+            subject: formData.get('subject')?.toString() || '',
+            message: formData.get('message')?.toString() || '',
+          };
+
+          // Validate form
+          const isValid = validateForm(data);
+          
+          if (!isValid) {
+            // Show general error message
+            if (errorText) errorText.textContent = 'Please fix the errors above and try again.';
+            if (messageContainer) messageContainer.classList.remove('hidden');
+            if (errorMessage) errorMessage.classList.remove('hidden');
+            if (successMessage) successMessage.classList.add('hidden');
+            return;
+          }
+          
+          // Disable button
+          if (button) {
+            button.disabled = true;
+            button.textContent = 'Sending...';
+          }
+          
+          // Reset messages
+          if (messageContainer) messageContainer.classList.add('hidden');
+          if (successMessage) successMessage.classList.add('hidden');
+          if (errorMessage) errorMessage.classList.add('hidden');
+          
+          try {
+            const response = await fetch('/contact', {
+              method: 'POST',
+              body: formData
+            });
+            
+            if (response.ok) {
+              // Success
+              form.reset();
+              // Clear any field errors
+              (['name', 'email', 'subject', 'message'] as Array<keyof typeof validators>).forEach(fieldName => {
+                showFieldError(fieldName, null);
+              });
+              if (messageContainer) messageContainer.classList.remove('hidden');
+              if (successMessage) successMessage.classList.remove('hidden');
+            } else {
+              // Error
+              const errorMsg = await response.text();
+              if (errorText) errorText.textContent = errorMsg;
+              if (messageContainer) messageContainer.classList.remove('hidden');
+              if (errorMessage) errorMessage.classList.remove('hidden');
+            }
+          } catch (error) {
+            // Network error
+            if (errorText) errorText.textContent = 'A network error occurred. Please try again.';
+            if (messageContainer) messageContainer.classList.remove('hidden');
+            if (errorMessage) errorMessage.classList.remove('hidden');
+          } finally {
+            // Restore button
+            if (button) {
+              button.disabled = false;
+              button.innerHTML = '<svg class="w-5 h-5"><use href="#ri:send-plane-line"></use></svg>Send Message';
+            }
+          }
         });
-        
-        if (response.ok) {
-          // Success
-          form.reset();
-          messageContainer?.classList.remove('hidden');
-          successMessage?.classList.remove('hidden');
-        } else {
-          // Error
-          const errorMsg = await response.text();
-          if (errorText) errorText.textContent = errorMsg;
-          messageContainer?.classList.remove('hidden');
-          errorMessage?.classList.remove('hidden');
-        }
-      } catch (error) {
-        // Network error
-        if (errorText) errorText.textContent = 'A network error occurred.';
-        messageContainer?.classList.remove('hidden');
-        errorMessage?.classList.remove('hidden');
-      } finally {
-        // Restore button
-        if (button) {
-          button.disabled = false;
-          button.innerHTML = '<svg class="w-5 h-5"><use href="#ri:send-plane-line"></use></svg>Send Message';
-        }
       }
     });
   </script>
