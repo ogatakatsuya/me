@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro build && wrangler dev",
     "astro": "astro",
     "format": "biome format --write ./src"
   },
