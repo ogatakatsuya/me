@@ -10,8 +10,7 @@ const blog = defineCollection({
 		updatedAt: z.coerce.date().optional(),
 		tags: z.array(z.string()),
 		summary: z.string(),
-		theme: z
-			.enum(["green", "blue", "gray", "beige", "brown"])
+		theme: z.enum(["green", "blue", "gray", "beige", "brown"]),
 	}),
 });
 
