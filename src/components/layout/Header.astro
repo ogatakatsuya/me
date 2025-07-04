@@ -71,7 +71,7 @@ const navLinks = [
   </div>
 
   <!-- Overlay -->
-  <div id="drawer-overlay" class="md:hidden fixed inset-0 bg-black invisible transition-all duration-300 ease-in-out z-30 pointer-events-none"/>
+  <div id="drawer-overlay" class="md:hidden fixed inset-0 bg-black/50 opacity-0 invisible transition-all duration-300 ease-in-out z-30 pointer-events-none"/>
 </header>
 
 <script is:inline>
@@ -86,14 +86,14 @@ const navLinks = [
     function openDrawer() {
       drawer.classList.remove('translate-x-full');
       overlay.classList.remove('opacity-0', 'invisible');
-      overlay.classList.add('pointer-events-auto');
+      overlay.classList.add('pointer-events-auto', 'opacity-100');
       document.body.style.overflow = 'hidden';
     }
 
     function closeDrawer() {
       drawer.classList.add('translate-x-full');
       overlay.classList.add('opacity-0', 'invisible');
-      overlay.classList.remove('pointer-events-auto');
+      overlay.classList.remove('pointer-events-auto', 'opacity-100');
       document.body.style.overflow = '';
     }
 
