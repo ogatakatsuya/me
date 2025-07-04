@@ -2,10 +2,6 @@
 import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import { Button } from "@/components/ui/button";
-import QiitaWhiteIcon from "@/assets/qiita-white-icon.png";
-import QiitaIcon from "@/assets/qiita-icon.png";
-import ZennWhiteIcon from "@/assets/zenn-white-icon.svg";
-import ZennIcon from "@/assets/zenn-icon.svg";
 ---
 
 <hr class="w-9/10 mx-auto h-px mb-2 bg-gray-300 border-0 dark:bg-gray-600">
@@ -32,18 +28,18 @@ import ZennIcon from "@/assets/zenn-icon.svg";
                 </Button>
                 <a href="https://qiita.com/Katsuya_Ogata" target="_blank" rel="noopener noreferrer">
                     <span class="block dark:hidden">
-                        <Image src={QiitaIcon} alt="Qiita" class="w-5 h-5" />
+                        <img src="/icons/qiita-white-icon.png" alt="Qiita" class="w-5 h-5" />
                     </span>
                     <span class="hidden dark:block">
-                        <Image src={QiitaWhiteIcon} alt="Qiita" class="w-5 h-5" />
+                        <img src="/icons/qiita-icon.png" alt="Qiita" class="w-5 h-5" />
                     </span>
                 </a>
                 <a href="https://zenn.dev/o_k_o" target="_blank" rel="noopener noreferrer">
                     <span class="block dark:hidden">
-                        <Image src={ZennIcon} alt="Zenn" class="w-5 h-5" />
+                        <img src="/icons/zenn-icon.svg" alt="Zenn" class="w-5 h-5" />
                     </span>
                     <span class="hidden dark:block">
-                        <Image src={ZennWhiteIcon} alt="Zenn" class="w-5 h-5" />
+                        <img src="/icons/zenn-white-icon.svg" alt="Zenn" class="w-5 h-5" />
                     </span>
                 </a>
             </div>
