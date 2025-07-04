@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, passthroughImageService } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 import react from '@astrojs/react';
@@ -57,6 +57,7 @@ export default defineConfig({
   },
 
   image: {
+    service: passthroughImageService(),
     remotePatterns: [{
       protocol: 'https',
       hostname: 'storage.r2.ogatakatsuya.com',
@@ -64,6 +65,9 @@ export default defineConfig({
   },
 
   adapter: cloudflare({
-    imageService: 'compile'
+    platformProxy: {
+      enabled: true,
+      persist: true,
+    },
   }),
 });
