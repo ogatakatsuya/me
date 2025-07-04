@@ -65,7 +65,9 @@ const navLinks = [
       
       <!-- Theme Toggle -->
       <div class="p-6 border-t border-slate-300 dark:border-slate-600">
-        <ThemeIcon />
+        <div id="drawer-theme-toggle">
+          <ThemeIcon />
+        </div>
       </div>
     </div>
   </div>
@@ -112,9 +114,15 @@ const navLinks = [
     overlay.addEventListener('click', closeDrawer);
 
     // Add theme toggle functionality for drawer
-    const drawerThemeToggle = document.getElementById('drawerThemeToggle');
+    const drawerThemeContainer = document.getElementById('drawer-theme-toggle');
+    const drawerThemeToggle = drawerThemeContainer?.querySelector('#themeToggle');
     if (drawerThemeToggle) {
-      drawerThemeToggle.addEventListener('click', () => {
+      // Remove any existing event listeners
+      const newDrawerThemeToggle = drawerThemeToggle.cloneNode(true);
+      drawerThemeToggle.parentNode?.replaceChild(newDrawerThemeToggle, drawerThemeToggle);
+      
+      // Add click event listener
+      newDrawerThemeToggle.addEventListener('click', () => {
         const element = document.documentElement;
         element.classList.toggle('dark');
         const isDark = element.classList.contains('dark');
