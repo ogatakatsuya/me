@@ -55,15 +55,17 @@ Timestamp: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
       body: formattedMessage
     };
 
+    const { env } = Astro.locals.runtime;
+
     const client = new SQSClient({
       region: "ap-northeast-1",
       credentials: {
-        accessKeyId: import.meta.env.SECRET_AWS_ACCESS_KEY,
-        secretAccessKey: import.meta.env.SECRET_AWS_SECRET_KEY,
+        accessKeyId: env.SECRET_AWS_ACCESS_KEY,
+        secretAccessKey: env.SECRET_AWS_SECRET_KEY,
       }
     });
     const params = {
-      QueueUrl: import.meta.env.SECRET_SQS_QUEUE_URL,
+      QueueUrl: env.SECRET_SQS_QUEUE_URL,
       MessageBody: JSON.stringify(sqsMessage),
     }
     const command = new SendMessageCommand(params);

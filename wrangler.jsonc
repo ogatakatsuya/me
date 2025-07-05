@@ -11,5 +11,10 @@
 	},
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "SECRET_AWS_ACCESS_KEY": "",
+    "SECRET_AWS_SECRET_KEY": "",
+    "SECRET_SQS_QUEUE_URL": ""
   }
-} 
+}
