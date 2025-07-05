@@ -5,6 +5,7 @@ import Layout from "@/layouts/BaseLayout.astro";
 import Title from "@/components/page/Title.astro";
 import { Icon } from "astro-icon/components";
 import { contactFormSchema } from "@/lib/schemas";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 if (Astro.request.method === "POST") {
 	try {
@@ -29,9 +30,43 @@ if (Astro.request.method === "POST") {
 
 		const validatedData = validationResult.data;
 
-		// Here you would implement actual email sending or database storage
-		// Example: email service or database storage
-		console.log("Contact form submitted:", validatedData);
+    const formattedMessage = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔔 New Contact Form Submission
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Sender Information:
+   Name: ${validatedData.name}
+   Email: ${validatedData.email}
+
+📧 Message Details:
+   Subject: ${validatedData.subject}
+
+📝 Message:
+${validatedData.message}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Timestamp: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `.trim();
+
+    const sqsMessage = {
+      subject: validatedData.subject,
+      body: formattedMessage
+    };
+
+    const client = new SQSClient({
+      credentials: {
+        accessKeyId: import.meta.env.SECRET_AWS_ACCESS_KEY,
+        secretAccessKey: import.meta.env.SECRET_AWS_SECRET_KEY,
+      }
+    });
+    const params = {
+      QueueUrl: import.meta.env.SECRET_SQS_QUEUE_URL,
+      MessageBody: JSON.stringify(sqsMessage),
+    }
+    const command = new SendMessageCommand(params);
+    await client.send(command);
 
 		// Success response
 		return new Response(

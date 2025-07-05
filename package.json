@@ -15,6 +15,7 @@
     "@astrojs/partytown": "^2.1.4",
     "@astrojs/react": "^4.2.2",
     "@astrojs/sitemap": "^3.4.1",
+    "@aws-sdk/client-sqs": "^3.840.0",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
