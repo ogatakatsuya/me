@@ -1,0 +1,301 @@
+---
+title: SES×Lambda×SQSでメールを送信する
+slug: ses-lambda-sqs-mail-send
+createdAt: Jul 05, 2025
+tags:
+  - AWS
+  - Cloudflare
+summary: 本ウェブサイトの問い合わせページで使用している、SESとLambda、SQSを組み合わせたメール送信の仕組みを紹介します。
+theme: gray
+---
+import { Image } from 'astro:assets';
+import image0 from '../../assets/blog/sqs-lambda-trigger.png';
+import image1 from '../../assets/blog/lambda-sqs-log.png';
+import image3 from '../../assets/blog/sqs-lambda-ses-arch.png';
+
+# 概要
+
+問い合わせが来た時に、どのように通知するかはいくつか選択肢があると思います。
+例えば、Google Spreadsheetに書き込む、Slackに通知する、メールを送るなどです。
+
+本ウェブサイトでは、インフラの練習も兼ねてメールを用いて行うことにしました。
+
+# 構成
+
+<Image src={image3} alt="SES Lambda SQSのアーキテクチャ"/>
+
+構成は、Cloudflare WorkersのSSRからAmazon SQSにメッセージを投げて、AWS Lambdaでそのメッセージを受け取り、AWS SESを用いてメールを送信するというものです。
+この構成を採用した理由は、主に以下の3つです。
+
+- 汎用的に使えるメール送信の仕組みを作るため
+- 非同期でメール送信処理を行うことで、ユーザーの待ち時間を減らすため
+- Amazon SQS × Amazon Lambdaの定番の組み合わせに触れるため
+
+メール送信については、よくあるResendやSendGrid等を使っても良いのですが、AWS大好きマンなので、SESを使うことにしました。
+
+また、AWSの鉄板サービスといえば、S3、EC2、SQSですが、唯一SQSだけ全く触れたことがなかったのでこの機会に触れてみました。
+SQSは可用性が高く、スケーラブルなメッセージキューサービスで、Lambdaとの組み合わせは非常に一般的なパターンです。
+
+以下の資料がとてもわかりやすかったです。
+
+https://speakerdeck.com/pikosan0000/sqs-lambda-devday2022
+
+# 1. SQSの作成
+
+まず、SQSを作成します。
+
+今回は特に何も考えずにマネコンからデフォルトの設定で作成しました。
+
+# 2. Lambdaの作成
+
+次に、Lambdaを作成します。
+
+言語は特にこだわりがなかったので、Golangで書きました。
+まずはSQSとの疎通を確認するために、シンプルなコードを書いてみました。
+
+ちょっとごちゃついてますが、eventを受け取ってその内容をログに出力するだけのコードです。
+
+```go
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/aws/aws-lambda-go/lambda"
+)
+
+type SendHandler struct{}
+
+func NewSendHandler() *SendHandler {
+	return &SendHandler{}
+}
+
+func (sh *SendHandler) HandleRequest(ctx context.Context, event map[string]interface{}) error {
+	log.Println("start handling event.", event)
+	return nil
+}
+
+func main() {
+	handler := NewSendHandler()
+	lambda.Start(handler.HandleRequest)
+}
+```
+
+次に、デプロイを行います。
+
+これはもう慣れたものです。こちらのDockerfileをローカルでビルドしてECRにプッシュします。
+
+```dockerfile
+FROM golang:1.24 AS build
+
+WORKDIR /app
+
+COPY ./go.mod ./go.sum ./
+RUN go mod download
+
+COPY . .
+
+ENV GOOS=linux
+ENV GOARCH=amd64
+
+RUN go build -tags lambda.norpc -o main ./main.go
+
+FROM public.ecr.aws/lambda/provided:al2023
+
+COPY --from=build /app/main ./main
+ENTRYPOINT [ "./main" ]
+```
+
+# 3. SQS -> Lambdaへのトリガー設定
+
+ここからはAWSのマネコン上で作業を行います。
+
+まず、LambdaのトリガーをSQSに設定します。これは、設定 > トリガーで設定を行うことができます。先ほど作成してSQSを選択すれば良いです。
+
+<Image src={image0} alt="SQSトリガーの設定画面" />
+
+ここでSQSに行く前に、IAMロールの設定を行います。
+
+必要な権限は以下です。便利なことに、それっぽいロールが用意されていました。
+
+メール送信に必要な権限も追加しておきます(FullAccessではなく、必要な権限だけを付与するのがベストプラクティスですが、今回は簡単にするためにFullAccessを付与しています)。
+
+- AWSLambdaBasicExecutionRole
+- AWSLambdaSQSQueueExecutionRole
+- AmazonSESFullAccess
+
+それでは、SQSからLambdaへの疎通を確認しに行きます。
+
+マネコンでは、手動でSQSにメッセージを投げることができます。
+ここから適当なメッセージを送ってみます。
+
+```json
+{
+  "message": "Hello world from SQS"
+}
+```
+
+無事、SQSに入ったメーセージをLambdaが受け取ることができました🙌
+
+<Image src={image1} alt="Lambdaのログ画面" />
+
+# 4. SESの設定
+
+ここでは深くSESの設定には触れません。
+
+具体的には、Cloudflareで管理しているドメインをSESに登録して、必要なレコードをCloudflareのDNSに登録しに行きます。
+
+以下の記事を参考にさせていただきました。
+
+https://qiita.com/SawaShuya/items/770ccc0cfeb5c1e427e4
+
+# 5. Lambdaでメール送信処理の実装
+
+以下は、メール送信を行う部分になります。
+
+もしかしたら、将来的にメール送信の仕組みを他のサービスに置き換える可能性もあるので、インターフェースを定義して実装しています。
+
+実装自体はシンプルで、用意されているSESのAPIを用いてメール送信を行うだけです。
+
+```go
+package pkg
+
+import (
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
+)
+
+type IEmailService interface {
+	SendEmail(from, to, subject, body string) error
+}
+
+type emailSender struct{}
+
+func NewEmailSender() IEmailService {
+	return &emailSender{}
+}
+
+func (es *emailSender) SendEmail(from, to, subject, body string) error {
+	ctx := context.Background()
+
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("ap-northeast-1"))
+	if err != nil {
+		return err
+	}
+
+	client := sesv2.NewFromConfig(cfg)
+
+	input := &sesv2.SendEmailInput{
+		FromEmailAddress: &from,
+		Destination: &types.Destination{
+			ToAddresses: []string{to},
+		},
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Text: &types.Content{
+						Data: &body,
+					},
+				},
+				Subject: &types.Content{
+					Data: &subject,
+				},
+			},
+		},
+	}
+
+	_, err = client.SendEmail(ctx, input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+```
+
+再度、SQSにメッセージを投げて、メールが送信されることを確認します。
+
+なお、メールの送信元と、送信先は、あらかじめ環境変数で指定しています。
+
+```json
+{
+  "subject": "Test Email",
+  "body": "Hello world from SQS"
+}
+```
+無事、指定したメールアドレスに独自のドメインからメールが送信されていました！！
+
+コードの全文は、以下のGitHubリポジトリにあります。
+
+https://github.com/ogatakatsuya/mail-sender
+
+# 6. Cloudflare Workers上からSQSにメッセージを送信する
+
+まず、Cloudflare Workers用のIAMユーザーを作成します。とりあえず、Send, Receiveのみの権限を与えてみました。(しっかりと動作しました🙆)
+
+次に、SSRでメッセージを送信するロジックを書いていきます。
+
+受け取ったフォームのデータからメール本文を組み立てています。ここはCopilotにしてもらいました。
+
+そして、クライアント作成->パラメータ作成->コマンド作成->APIを叩くといういつもの流れでSQSにメッセージを送信しています。
+
+```typescript
+    const formattedMessage = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔔 New Contact Form Submission
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Sender Information:
+   Name: ${validatedData.name}
+   Email: ${validatedData.email}
+
+📧 Message Details:
+   Subject: ${validatedData.subject}
+
+📝 Message:
+${validatedData.message}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Timestamp: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `.trim();
+
+    const sqsMessage = {
+      subject: validatedData.subject,
+      body: formattedMessage
+    };
+
+    const { env } = Astro.locals.runtime;
+
+    const client = new SQSClient({
+      region: "ap-northeast-1",
+      credentials: {
+        accessKeyId: env.SECRET_AWS_ACCESS_KEY,
+        secretAccessKey: env.SECRET_AWS_SECRET_KEY,
+      }
+    });
+    const params = {
+      QueueUrl: env.SECRET_SQS_QUEUE_URL,
+      MessageBody: JSON.stringify(sqsMessage),
+    }
+    const command = new SendMessageCommand(params);
+    await client.send(command);
+```
+
+これで、Cloudflare Workers上から、SQSにメッセージを送信することができるようになりましたﾔｯﾀｰ
+
+# まとめ
+
+今回は、メール送信をAWSのサービスを色々と組み合わせて作ってみました。
+
+ResendやSendGridなどのメール送信サービスを使っている方が多いと思いますが、練習がてら、もっと大規模なサービスでも通用するようなスケーラブルな構成にしてみました。
+
+おそらくほとんど無料で運用できると思うので、当分はこの構成で運用していこうと思います。
+
+あとはRecaptchaとかを入れてみようかなぁとか考えています🤔
+
+以上。
