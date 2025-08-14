@@ -1,0 +1,288 @@
+---
+title: gpt-ossを日本語でreasoningさせる
+slug: gpt-oss-japanese-reasoning
+createdAt: Aug 14, 2025
+tags:
+  - LLM
+  - fine-tuning
+  - gpt-oss
+summary: "gpt-ossを日本語でreasoningさせるためのファインチューニング手法について解説します。"
+theme: green
+---
+
+# はじめに
+
+gpt-ossが出ましたね。
+
+ついにOpenAIがOpen WeightなLLMを公開してくれました。20bの方だけを使ってみた感じ、軽量で、CPU上でも割と実用的な範囲で動作する上に
+そこそこ賢くてローカルLLMの実現がかなり現実的になったなぁと感じました。
+
+ここで、cookbookを眺めていると、ファインチューニング手法について解説している記事がありました。
+
+https://cookbook.openai.com/articles/gpt-oss/fine-tune-transfomers
+
+少し調べてみると、unslothやwandbもgpt-ossのファインチューニングについての記事を書いているようです。
+
+親切ですね。
+
+
+インターン先の上司のすすめでWandBを研究で使うと、進捗報告が楽になるらしいので、今回はWandBのキャッチアップも兼ねて、gpt-ossのファインチューニングをしてみたいと思います。
+（といいつつ、WandBをパラメータに仕込むだけなんですがね。。）
+
+また、どのチュートリアルも、同じ多言語対応のreasoningデータセットを用いていますが、同じだと面白くないので、日本語でreasoning
+させてみようと思います。
+
+# 使用させていただいたデータセット
+
+今回は、以下のデータセットを使用させていただきました。
+
+データセットの内容としては数学の問題をreasoningを用いて解くという内容のものです。
+
+https://huggingface.co/datasets/Kendamarron/OpenMathInstruct-2-ja-CoT
+
+'japanese reasoning dataset'とかで調べるとわかりますが、とにかく、日本語のreasoningモデル用のデータセットって少ないんですね。
+
+諦めていたら、以下のブログに出会いました。ありがたやぁ〜。
+
+https://zenn.dev/kendama/articles/544d7b1216a8d7
+
+# ファインチューニング
+
+基本的には、WandBのファインチューニングのチュートリアルのコードに従って、カチャカチャ模写していくだけで動きます。
+
+ただ、今回はデータセットはgpt-ossのI/Fにあったものではないため、前処理の部分は自前で実装する必要があります。
+データセットの処理は以下のように書きました。
+
+```python
+class ReasoningData(Mapping):
+  
+  def __init__(self, data: dict):
+    self.question = data.get('problem_ja')
+    self.reasoning = data.get('thought')
+    self.answer = self._clean_output(data.get('output'))
+    
+    self._data = {
+      'question': self.question,
+      'reasoning': self.reasoning,
+      'answer': self.answer
+    }
+  
+  def _clean_output(self, output: str | None) -> str:
+    if output and output.endswith('</Output>'):
+      return output[:-9]  # '</Output>'の文字数分を除去
+    return output or ""
+```
+
+まず、ダウンロードしてきたデータの解答の末尾に
+`</Output>`がついているので、これを除去する処理を入れています。
+
+次に、gpt-ossのI/Fに合わせて、フォーマットする関数を定義します。
+
+公式のチュートリアルのデータセットは既にこの形になっているので、特に気にせず`SFTTrainer`に突っ込んでいます。
+
+先程前処理を行って、`question`, `reasoning`, `answer`に分けたのを、`apply_chat_template`を使ってgpt-ossのI/Fに合わせてフォーマットします。
+
+```python
+def formatting_func(data):
+    """辞書形式のデータを受け取ってフォーマットする"""
+    messages = [
+        {'role': 'user', 'content': data['question']},
+        {'role': 'assistant', 'content': data['answer'], 'thinking': data['reasoning']},
+    ]
+    return tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=False,
+    )
+```
+
+最後に、この関数をSFTTrainerに渡してあげれば、正しくファインチューニングを実行することができます。
+忘れずに、SFTConfigには、WandBの設定を入れておきます。これだけで立派なレポートが出来上がるので最高ですね。
+
+```python
+training_args = SFTConfig(
+    learning_rate=2e-4,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    gradient_checkpointing=True,
+    num_train_epochs=2,
+    logging_steps=1,
+    max_length=2048,
+    warmup_ratio=0.03,
+    lr_scheduler_type="cosine_with_min_lr",
+    lr_scheduler_kwargs={"min_lr_rate": 0.1},
+    output_dir="gpt-oss-20b-japanese-math-reasoning",
+    report_to="wandb",
+    push_to_hub=False,
+)
+
+trainer = SFTTrainer(
+    model=peft_model,
+    args=training_args,
+    train_dataset=processed_dataset,
+    formatting_func=formatting_func,
+    processing_class=tokenizer,
+)
+```
+
+ファインチューニングのコードは以下のGitHubリポジトリに置いています。
+
+https://github.com/ogatakatsuya/finetune-gpt-oss
+
+# 推論
+
+わくわくの推論タイムですね。
+
+今回は、WandBのweaveの機能を使って、推論結果を保存してみました。
+
+結果はこんな感じ。
+
+```
+<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-14
+
+Reasoning: medium
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.<|end|><|start|>user<|message|>1から10までの整数の合計を求めてください。<|end|><|start|>assistant<|channel|>analysis<|message|>1から10までの整数の合計を求めるには、以下のステップを踏みます。
+
+1. まず、1から10までの整数を列挙します。
+   - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+2. 次に、これらの数の合計を計算します。
+   - 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10
+
+3. この計算を実行します。
+   - 1 + 2 = 3
+   - 3 + 3 = 6
+   - 6 + 4 = 10
+   - 10 + 5 = 15
+   - 15 + 6 = 21
+   - 21 + 7 = 28
+   - 28 + 8 = 36
+   - 36 + 9 = 45
+   - 45 + 10 = 55
+
+したがって、1から10までの整数の合計は55です。<|end|><|start|>assistant<|channel|>final<|message|>1から10までの整数の合計は55です。
+<|return|>
+```
+
+良い感じに、日本語で推論してくれてますね。ﾔｯﾀｰ
+
+次は、数学以外のクエリを投げてみます。
+
+```markdown
+<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-14
+
+Reasoning: medium
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.<|end|><|start|>user<|message|>東京観光のプランを考えてください。<|end|><|start|>assistant<|channel|>analysis<|message|>東京観光のプランを考える際、まずは訪問者の興味や滞在期間、予算などを考慮に入れる必要があります。以下では、一般的な観光客を想定し、3日間の東京観光プランを提案します。
+
+### 1日目: 歴史と文化を感じる
+
+#### 午前
+- **浅草寺**: 東京で最も古い寺院で、雷門で有名です。雷門から仲見世通りを通り、様々な土産物店や屋台を楽しむことができます。
+- **浅草文化観光センター**: 浅草の歴史や文化について学べる展示があります。
+
+#### 午後
+- **東京スカイツリー**: 浅草から電車で約30分。東京の象徴的な塔で、展望台から東京の景色を一望できます。
+- **東京スカイツリータウン**: ショッピングや食事が楽しめる複合施設です。
+
+#### 夜
+- **築地市場**: 新鮮な海産物を楽しめる市場です。築地市場は再開発され、築地市場の代わりに築地市場の新しい形として築地市場が再開発されました。
+- **築地市場の居酒屋で夕食**: 新鮮な海鮮料理を楽しめます。
+
+### 2日目: 現代とエンターテインメントを楽しむ
+
+#### 午前
+- **渋谷**: 渋谷のスクランブル交差点は世界的に有名です。周辺には多くのショッピングモールやカフェがあります。
+- **渋谷センター街**: さまざまなショップやレストランが立ち並んでいます。
+
+#### 午後
+- **原宿**: 原宿の竹下通りは、ファッションやお土産を買うのに最適な場所です。
+- **明治神宮**: 原宿から徒歩で行ける、東京で最も重要な神社の一つです。
+
+#### 夜
+- **新宿**: 新宿は東京のエンターテインメントの中心地です。歌舞伎町や新宿ゴールデン街など、さまざまなエンターテインメントが楽しめます。
+- **新宿の居酒屋で夕食**: 新宿の居酒屋で地元の料理を楽しむことができます。
+
+### 3日目: 自然とリラクゼーション
+
+#### 午前
+- **上野公園**: 上野公園は東京の自然を楽しめる場所で、上野動物園や東京国立博物館などがあります。
+- **上野動物園**: 日本最古の動物園で、パンダなどの珍しい動物を見ることができます。
+
+#### 午後
+- **台場**: 台場は人工の島で、東京湾に面しています。台場には多くのショッピングモールやアミューズメント施設があります。
+- **台場の海浜公園**: 台場の海浜公園は、東京湾を一望できる場所です。
+
+#### 夜
+- **台場のレインボーブリッジ**: 台場のレインボーブリッジは、夜になるとライトアップされ、東京の夜景を楽しむことができます。
+- **台場のレストランで夕食**: 台場のレストランで地元の料理を楽しむことができます。
+
+このプランは、東京の歴史、文化、現代、エンターテインメント、自然を楽しむことができます。ただし、訪問者の興味や滞在期間、予算などによって、プランは調整する必要があります。<|end|><|start|>assistant<|channel|>final<|message|>東京観光のプランを考える際、まずは訪問者の興味や滞在期間、予算などを考慮に入れる必要があります。以下では、一般的な観光客を想定し、3日間の東京観光プランを提案します。
+
+### 1日目: 歴史と文化を感じる
+
+#### 午前
+- **浅草寺**: 東京で最も古い寺院で、雷門で有名です。雷門から仲見世通りを通り、様々な土産物店や屋台を楽しむことができます。
+- **浅草文化観光センター**: 浅草の歴史や文化について学べる展示があります。
+
+#### 午後
+- **東京スカイツリー**: 浅草から電車で約30分。東京の象徴的な塔で、展望台から東京の景色を一望できます。
+- **東京スカイツリータウン**: ショッピングや食事が楽しめる複合施設です。
+
+#### 夜
+- **築地市場**: 新鮮な海産物を楽しめる市場です。築地市場は再開発され、築地市場の代わりに築地市場の新しい形として築地市場が再開発されました。
+- **築地市場の居酒屋で夕食**: 新鮮な海鮮料理を楽しめます。
+
+### 2日目: 現代とエンターテインメントを楽しむ
+
+#### 午前
+- **渋谷**: 渋谷のスクランブル交差点は世界的に有名です。周辺には多くのショッピングモールやカフェがあります。
+- **渋谷センター街**: さまざまなショップやレストランが立ち並んでいます。
+
+#### 午後
+- **原宿**: 原宿の竹下通りは、ファッションやお土産を買うのに最適な場所です。
+- **明治神宮**: 原宿から徒歩で行ける、東京で最も重要な神社の一つです。
+
+#### 夜
+- **新宿**: 新宿は東京のエンターテインメントの中心地です。歌舞伎町や新宿ゴールデン街など、さまざまなエンターテインメントが楽しめます。
+- **新宿の居酒屋で夕食**: 新宿の居酒屋で地元の料理を楽しむことができます。
+
+### 3日目: 自然とリラクゼーション
+
+#### 午前
+- **上野公園**: 上野公園は東京の自然を楽しめる場所で、上野動物園や東京国立博物館などがあります。
+- **上野動物園**: 日本最古の動物園で、パンダなどの珍しい動物を見ることができます。
+
+#### 午後
+- **台場**: 台場は人工の島で、東京湾に面しています。台場には多くのショッピングモールやアミューズメント施設があります。
+- **台場の海浜公園**: 台場の海浜公園は、東京湾を一望できる場所です。
+
+#### 夜
+- **台場のレインボーブリッジ**: 台場のレインボーブリッジは、夜になるとライトアップされ、東京の夜景を楽しむことができます。
+- **台場のレストランで夕食**: 台場のレストランで地元の料理を楽しむことができます。
+
+このプランは、東京の歴史、文化、現代、エンターテインメント、自然を楽しむことができます。ただし、訪問者の興味や滞在期間、予算などによって、プランは調整する必要があります。
+<|return|>
+```
+
+とても良い感じではないでしょうか！？？
+
+日本語で推論させることによるメリットはベンチマークを取ってみないとわかりませんが、体感、日本語に対する理解度や返答分の制度が向上しているような気がしたようなそんなでもないような。。。
+
+# まとめ
+
+20bってものすごく大きなモデルなんですが、120bとか出てきちゃうとなんだか小さく感じてしまいますね。
+
+それにしてもすごく賢い。このくらいの大きさのモデルでファインチューニングしてドメインに特化させてローカルでホストできたらいろんな選択肢が広がりそうですね。
+
+個人的には、登山するときとかに使えたら良いなと思っています。
+
+あ、せっかくなので、WandBのダッシュボードも公開しておきます。
+
+https://wandb.ai/katsuya151225-/finetune-gpt-oss-math-reasoning/runs/th4kb3cc?nw=nwuserkatsuya151225
+
