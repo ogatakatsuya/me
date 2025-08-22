@@ -1,0 +1,91 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+type HeadingWithSubheadings = MarkdownHeading & {
+  subheadings: MarkdownHeading[];
+};
+
+const { headings } = Astro.props;
+
+const groupedHeadings = headings.reduce((array, heading) => {
+  if (heading.depth === 2) {
+    array.push({ ...heading, subheadings: [] });
+  } else if (heading.depth === 3) {
+    array.at(-1)?.subheadings.push(heading);
+  }
+  return array;
+}, [] as HeadingWithSubheadings[]);
+---
+
+{
+  groupedHeadings.length > 0 && (
+    <details class="toc">
+      <summary class="toc-title">
+        <span style="font-size:1em; margin-right:0.3em; color:#6d6a6a;">▼</span>目次
+      </summary>
+      <ol>
+        {groupedHeadings.map((heading) => (
+          <li>
+            <a href={heading.slug ? `#${heading.slug}` : undefined}>{heading.text}</a>
+            {heading.subheadings.length > 0 && (
+              <ol>
+                {heading.subheadings.map((sub) => (
+                  <li>
+                    <a href={sub.slug ? `#${sub.slug}` : undefined}>{sub.text}</a>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </li>
+        ))}
+      </ol>
+    </details>
+  )
+}
+
+<style>
+  .toc {
+    border: 1px solid #bbb;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    background: #f8f9fa;
+    color: #222;
+  }
+
+  .toc-title {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #1f1c1c;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+  }
+
+  .toc ol {
+    list-style: none;
+    padding-left: 12px;
+    margin: 0;
+  }
+
+  .toc ol li {
+    margin-block: 0.15rem;
+    line-height: 1.2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .toc {
+      background: #343e4e;
+      color: #f8f9fa;
+      border-color: #42434e;
+    }
+    .toc-title {
+      color: #c2c3d0;
+    }
+  }
+</style>
