@@ -10,6 +10,13 @@ const blog = defineCollection({
 		updatedAt: z.coerce.date().optional(),
 		tags: z.array(z.string()),
 		summary: z.string(),
+		/*
+			green: ai/ml
+			blue: poem
+			gray: web development
+			beige: life
+			brown: others
+		*/
 		theme: z.enum(["green", "blue", "gray", "beige", "brown"]),
 	}),
 });
