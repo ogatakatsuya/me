@@ -85,6 +85,12 @@ const { Content, headings } = await render(post);
 
     & p {
       margin-block: 0.75rem;
+      font-size: 1.125rem;
+    }
+    @media (max-width: 600px) {
+      & p {
+        font-size: 1.00rem;
+      }
     }
 
     & table {
