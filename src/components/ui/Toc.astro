@@ -25,7 +25,7 @@ const groupedHeadings = headings.reduce((array, heading) => {
   groupedHeadings.length > 0 && (
     <details class="toc">
       <summary class="toc-title">
-        <span style="font-size:1em; margin-right:0.3em; color:#6d6a6a;">▼</span>目次
+        <span style="font-size:1em; margin-right:0.3em; color:#d1caca;">▼</span>目次
       </summary>
       <ol>
         {groupedHeadings.map((heading) => (
@@ -80,12 +80,12 @@ const groupedHeadings = headings.reduce((array, heading) => {
 
   @media (prefers-color-scheme: dark) {
     .toc {
-      background: #343e4e;
+      background: #404855;
       color: #f8f9fa;
       border-color: #42434e;
     }
     .toc-title {
-      color: #c2c3d0;
+      color: #f8f8f8;
     }
   }
 </style>
