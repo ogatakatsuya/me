@@ -13,7 +13,7 @@ import { Image } from 'astro:assets';
 import image0 from '../../assets/blog/arxiv-notify-architecture.png';
 import image1 from '../../assets/blog/slack-notify.png';
 
-# 概要
+## 概要
 
 最近、研究室に配属されVision Language Modelを用いた研究を始めました。
 
@@ -23,7 +23,7 @@ import image1 from '../../assets/blog/slack-notify.png';
 
 https://qiita.com/yuta0821/items/2edf338a92b8a157af37
 
-# 構成
+## 構成
 
 いつもの如くAWSを用いた構成で実装を行いました。
 
@@ -35,11 +35,11 @@ https://qiita.com/yuta0821/items/2edf338a92b8a157af37
 
 https://speakerdeck.com/rokuosan/scheduled-cloudflare-workers?slide=28
 
-# 実装詳細
+## 実装詳細
 
 今回は、定期的にarXivのAPIを使ってクエリするだけでなく、Gemini APIを用いてサマリを生成してもらうので、やりやすいかなと思い、Pythonで実装を行いました。
 
-## 1\. arXiv APIを用いて論文を取得
+### 1\. arXiv APIを用いて論文を取得
 思ったよりも簡単に実装できます。
 arXivからトークンを取得する必要もなく、arXivのライブラリをインストールして、クエリを投げるだけです。`results`には、`arxiv.Result`のリストが入ってきます。
 
@@ -63,7 +63,7 @@ search = arxiv.Search(
 results = client.results(search)
 ```
 
-## 2\. GeminiAPIを用いてサマリを生成する
+### 2\. GeminiAPIを用いてサマリを生成する
 
 先ほど取得した`arxiv.Result`のリストを1つ1つ処理していきます。（バッチでやればよかったなぁ。。。）
 
@@ -119,7 +119,7 @@ SYSTEM_PROMPT = """
 """
 ```
 
-## 3\. Slackに通知を行う
+### 3\. Slackに通知を行う
 
 SlackにBotを追加するフローについては、記事が溢れているのでそちらを参考にしてください。適切な権限を与えたトークンを取得して、ワークスペースにインストールすれば
 以下のコードでメッセージを送信することができるようになります。
@@ -144,7 +144,7 @@ for i, result in enumerate(result_list, start=1):
 
 <Image src={image1} alt="Slack通知のメッセージ" width="{800}" height="{400}"/>
 
-## 4\. Triggerの設定を行う
+### 4\. Triggerの設定を行う
 
 Lambdaのデプロイ方法は割愛します。ECRを用いたDocker Imageでのデプロイを採用しました。`uv`を用いたビルドも公式からDockerfileが公開されており、ほとんどそのままデプロイできました。
 
@@ -154,7 +154,7 @@ https://docs.astral.sh/uv/guides/integration/aws-lambda/
 ここで、cronの設定を行うことで、定期的にLambdaを実行することができます。
 今回は、毎週月曜日の朝10時に実行するようにしました。
 
-# まとめ
+## まとめ
 
 執筆中に気づいてしまった設計・実装ミスが所々漏れてしまいました。。
 

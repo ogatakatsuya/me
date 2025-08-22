@@ -13,14 +13,14 @@ import image0 from '../../assets/blog/sqs-lambda-trigger.png';
 import image1 from '../../assets/blog/lambda-sqs-log.png';
 import image3 from '../../assets/blog/sqs-lambda-ses-arch.png';
 
-# 概要
+## 概要
 
 問い合わせが来た時に、どのように通知するかはいくつか選択肢があると思います。
 例えば、Google Spreadsheetに書き込む、Slackに通知する、メールを送るなどです。
 
 本ウェブサイトでは、インフラ構築の練習も兼ねてメールを用いて行うことにしました。
 
-# 構成
+## 構成
 
 <Image src={image3} alt="SES Lambda SQSのアーキテクチャ"/>
 
@@ -40,13 +40,15 @@ SQSは可用性が高く、スケーラブルなメッセージキューサー�
 
 https://speakerdeck.com/pikosan0000/sqs-lambda-devday2022
 
-# 1. SQSの作成
+## 実装手順
+
+### 1. SQSの作成
 
 まず、SQSを作成します。
 
 今回は特に何も考えずにマネコンからデフォルトの設定で作成しました。
 
-# 2. Lambdaの作成
+### 2. Lambdaの作成
 
 次に、Lambdaを作成します。
 
@@ -107,7 +109,7 @@ COPY --from=build /app/main ./main
 ENTRYPOINT [ "./main" ]
 ```
 
-# 3. SQS -> Lambdaへのトリガー設定
+### 3. SQS -> Lambdaへのトリガー設定
 
 ここからはAWSのマネコン上で作業を行います。
 
@@ -140,7 +142,7 @@ ENTRYPOINT [ "./main" ]
 
 <Image src={image1} alt="Lambdaのログ画面" />
 
-# 4. SESの設定
+### 4. SESの設定
 
 ここでは深くSESの設定には触れません。
 
@@ -150,7 +152,7 @@ ENTRYPOINT [ "./main" ]
 
 https://qiita.com/SawaShuya/items/770ccc0cfeb5c1e427e4
 
-# 5. Lambdaでメール送信処理の実装
+### 5. Lambdaでメール送信処理の実装
 
 以下は、メール送信を行う部分になります。
 
@@ -233,7 +235,7 @@ func (es *emailSender) SendEmail(from, to, subject, body string) error {
 
 https://github.com/ogatakatsuya/mail-sender
 
-# 6. Cloudflare Workers上からSQSにメッセージを送信する
+### 6. Cloudflare Workers上からSQSにメッセージを送信する
 
 まず、Cloudflare Workers用のIAMユーザーを作成します。とりあえず、Send, Receiveのみの権限を与えてみました。(しっかりと動作しました🙆)
 
@@ -288,7 +290,7 @@ Timestamp: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
 
 これで、Cloudflare Workers上から、SQSにメッセージを送信することができるようになりましたﾔｯﾀｰ
 
-# まとめ
+## まとめ
 
 今回は、メール送信をAWSのサービスを色々と組み合わせて作ってみました。
 

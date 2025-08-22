@@ -10,7 +10,7 @@ summary: "gpt-ossを日本語でreasoningさせるためのファインチュー
 theme: green
 ---
 
-# はじめに
+## はじめに
 
 gpt-ossが出ましたね。
 
@@ -34,7 +34,7 @@ https://cookbook.openai.com/articles/gpt-oss/fine-tune-transfomers
 また、どのチュートリアルも、同じ多言語対応のreasoningデータセットを用いていますが、同じだと面白くないので、日本語でreasoning
 させてみようと思います。
 
-# 使用させていただいたデータセット
+## 使用させていただいたデータセット
 
 今回は、以下のデータセットを使用させていただきました。
 
@@ -48,7 +48,7 @@ https://huggingface.co/datasets/Kendamarron/OpenMathInstruct-2-ja-CoT
 
 https://zenn.dev/kendama/articles/544d7b1216a8d7
 
-# ファインチューニング
+## ファインチューニング
 
 基本的には、WandBのファインチューニングのチュートリアルのコードに従って、カチャカチャ模写していくだけで動きます。
 
@@ -131,7 +131,7 @@ trainer = SFTTrainer(
 
 https://github.com/ogatakatsuya/finetune-gpt-oss
 
-# 推論
+## 推論
 
 わくわくの推論タイムですね。
 
@@ -276,7 +276,7 @@ Reasoning: medium
 
 日本語で推論させることによるメリットはベンチマークを取ってみないとわかりませんが、体感、日本語に対する理解度や返答分の制度が向上しているような気がしたようなそんなでもないような。。。
 
-# まとめ
+## まとめ
 
 20bってものすごく大きなモデルなんですが、120bとか出てきちゃうとなんだか小さく感じてしまいますね。
 

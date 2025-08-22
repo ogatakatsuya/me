@@ -12,13 +12,13 @@ theme: gray
 import { Image } from 'astro:assets'; 
 import image0 from '../../assets/blog/lambda-og-gen-arch.png';
 
-# 概要
+## 概要
 
 僕がウェブサイトを立ち上げるとき、最も気を遣う中の1つの要素がOG画像です。最初にmetaタグに画像を埋め込んで、Slackで送ったときに画像が出てきた時の興奮を今も覚えています。
 
 今回は、Astroでブログ記事を作成したときに、自動でOG画像が生成される仕組みを作ったので、その解説を行いたいと思います。
 
-# 構成
+## 構成
 
 よくある構成は、Cloudflare Functionか\`@vercel/og\`を使う方法だと思うのですが、今回は、AWS Lambdaで\`canvas\`を用いてOG画像を生成し、それをCloudflare R2にアップロードして使う方法を紹介します。
 
@@ -44,9 +44,9 @@ import image0 from '../../assets/blog/lambda-og-gen-arch.png';
 
 1から順を追って説明します。
 
-# 実装詳細
+## 実装詳細
 
-## 1\. 変更を検知するワークフロー
+### 1\. 変更を検知するワークフロー
 
 なんとも便利なactionsがあったのでこれを使用させていただきました。
 
@@ -73,7 +73,7 @@ import image0 from '../../assets/blog/lambda-og-gen-arch.png';
           pnpm exec tsx scripts/invokeLambda.ts
 ```
 
-## 2\. スクリプトを実行してLambdaをInvoke
+### 2\. スクリプトを実行してLambdaをInvoke
 
 作成したスクリプトの全文です。
 
@@ -151,7 +151,7 @@ async function main() {
 main();
 ```
 
-## 3\. OG画像を生成してR2に格納
+### 3\. OG画像を生成してR2に格納
 
 OG画像生成部分のスクリプトが以下です。
 
@@ -269,7 +269,7 @@ export const uploadToR2 = async (file: Buffer, bucketName: string, fileName: str
 
 これでOG画像が生成されるフローができました！
 
-# Lambdaのデプロイ
+## Lambdaのデプロイ
 
 AWSから提供されているDocker imageをbaseにして構築します。
 
@@ -298,7 +298,7 @@ COPY --from=base /usr/app/assets ./assets
 CMD ["dist/app.handler"]
 ```
 
-# まとめ
+## まとめ
 
 OG画像をLambdaを用いて生成する方法を解説しました。
 
