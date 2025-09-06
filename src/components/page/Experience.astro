@@ -4,62 +4,70 @@ import { Icon } from "astro-icon/components";
 import { Card, CardContent } from "@/components/ui/card";
 
 const experiences = [
-	{
-		index: "first",
-		title: "Bachelor",
-		company: "Osaka University",
-		link: "https://www.osaka-u.ac.jp/en",
-		year: "2022/04 - present",
-		side: "left",
-	},
-	{
-		index: "second",
-		title: "Long term Internship",
-		company: "Emuni",
-		link: "https://www.emuniinc.jp/",
-		year: "2024/05 - Present",
-		side: "right",
-	},
-	{
-		index: "third",
-		title: "Internship",
-		company: "Yuzuriha",
-		link: "https://yzrh.jp/",
-		year: "2024/05 - 2024/06",
-		side: "left",
-	},
-	{
-		index: "fourth",
-		title: "Internship",
-		company: "Speee",
-		link: "https://speee.jp/",
-		year: "2024/08 (3weeks)",
-		side: "right",
-	},
-	{
-		index: "fifth",
-		title: "Internship",
-		company: "Visional",
-		link: "https://www.visional.inc/ja/index.html",
-		year: "2024/09 (1week)",
-		side: "left",
-	},
-	{
-		index: "sixth",
-		title: "Internship(Go College)",
-		company: "CyberAgent",
-		link: "https://www.cyberagent.co.jp/",
-		year: "2025/02 - 2025/03",
-		side: "right",
-	},
-	{
-		index: "seventh",
-		title: "Long term Internship",
-		company: "Techouse",
-		link: "https://jp.techouse.com/",
-		year: "2024/09 - 2025/04",
-		side: "left",
-	},
+    {
+        index: "first",
+        title: "Bachelor",
+        company: "Osaka University",
+        link: "https://www.osaka-u.ac.jp/en",
+        year: "2022/04 - present",
+        side: "left",
+    },
+    {
+        index: "second",
+        title: "Long term Internship",
+        company: "Emuni",
+        link: "https://www.emuniinc.jp/",
+        year: "2024/05 - Present",
+        side: "right",
+    },
+    {
+        index: "third",
+        title: "Internship",
+        company: "Yuzuriha",
+        link: "https://yzrh.jp/",
+        year: "2024/05 - 2024/06",
+        side: "left",
+    },
+    {
+        index: "fourth",
+        title: "Internship",
+        company: "Speee",
+        link: "https://speee.jp/",
+        year: "2024/08 (3weeks)",
+        side: "right",
+    },
+    {
+        index: "fifth",
+        title: "Internship",
+        company: "Visional",
+        link: "https://www.visional.inc/ja/index.html",
+        year: "2024/09 (1week)",
+        side: "left",
+    },
+    {
+        index: "sixth",
+        title: "Internship(Go College)",
+        company: "CyberAgent",
+        link: "https://www.cyberagent.co.jp/",
+        year: "2025/02 - 2025/03",
+        side: "right",
+    },
+    {
+        index: "seventh",
+        title: "Long term Internship",
+        company: "Techouse",
+        link: "https://jp.techouse.com/",
+        year: "2024/09 - 2025/04",
+        side: "left",
+    },
+    {
+        index: "eighth",
+        title: "Long term Internship",
+        company: "Salesbrain",
+        link: "https://salesbrain.co.jp/",
+        year: "2025/08 - present",
+        side: "right",
+    },
 ];
 ---
 
@@ -68,61 +76,101 @@ const experiences = [
         {/* デスクトップ版 */}
         <div class="relative w-full max-w-3xl mx-auto hidden md:block">
             {/* 中央線 */}
-            <div class="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gray-500 h-full" />
-            
-            {experiences.map((exp) => (
-                <div class={clsx(
-                    "relative flex items-center", 
-                    exp.side === "left" 
-                        ? "flex-row" 
-                        : "flex-row-reverse"
-                )}>
-                    {/* カード */}
-                    <div class={clsx(
-                        "w-5/12",
-                        exp.side === "left" ? "pr-8" : "pl-8"
-                    )}>
-                        <Card className="shadow-lg text-center bg-gradient-to-b from-slate-100 to-slate-300/80 dark:from-gray-800 dark:to-gray-700/60">
-                            {/* アイコンとタイトル */}
-                            <CardContent className="grid gap-2">
-                                <h3 class="text-xl font-bold">{exp.title}</h3>
-                                <a class="text-gray-600 dark:text-gray-400 hover:underline" target="blank" href={exp.link}>{exp.company}</a>
-                                <span class="text-sm text-gray-500 dark:text-gray-500">{exp.year}</span>
-                            </CardContent>
-                        </Card>
+            <div
+                class="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gray-500 h-full"
+            >
+            </div>
+
+            {
+                experiences.map((exp) => (
+                    <div
+                        class={clsx(
+                            "relative flex items-center",
+                            exp.side === "left"
+                                ? "flex-row"
+                                : "flex-row-reverse",
+                        )}
+                    >
+                        {/* カード */}
+                        <div
+                            class={clsx(
+                                "w-5/12",
+                                exp.side === "left" ? "pr-8" : "pl-8",
+                            )}
+                        >
+                            <Card className="shadow-lg text-center bg-gradient-to-b from-slate-100 to-slate-300/80 dark:from-gray-800 dark:to-gray-700/60">
+                                {/* アイコンとタイトル */}
+                                <CardContent className="grid gap-2">
+                                    <a
+                                        href={exp.link}
+                                        class="hover:underline"
+                                        target="blank"
+                                    >
+                                        <h3 class="text-xl font-bold">
+                                            {exp.company}
+                                        </h3>
+                                    </a>
+                                    <p class="text-md font-semibold text-gray-700 dark:text-gray-400">
+                                        {exp.title}
+                                    </p>
+                                    <span class="text-sm text-gray-500 dark:text-gray-500">
+                                        {exp.year}
+                                    </span>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* 点 */}
+                        <div class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+                            <div class="w-4 h-4 bg-gray-500 rounded-full border-4 border-white z-10" />
+                        </div>
+
+                        {/* 接続線 */}
+                        <div
+                            class={clsx(
+                                "absolute top-1/2 transform -translate-y-1/2 w-1/12 h-1 bg-gray-500",
+                                exp.side === "left"
+                                    ? "left-5/12 -translate-x-4"
+                                    : "right-5/12 translate-x-4",
+                            )}
+                        />
                     </div>
-                    
-                    {/* 点 */}
-                    <div class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
-                        <div class="w-4 h-4 bg-gray-500 rounded-full border-4 border-white z-10"></div>
-                    </div>
-                    
-                    {/* 接続線 */}
-                    <div class={clsx(
-                        "absolute top-1/2 transform -translate-y-1/2 w-1/12 h-1 bg-gray-500",
-                        exp.side === "left" 
-                            ? "left-5/12 -translate-x-4" 
-                            : "right-5/12 translate-x-4"
-                    )} />
-                </div>
-            ))}
+                ))
+            }
         </div>
-        
+
         {/* モバイル版 */}
         <div class="relative w-full max-w-md mx-auto md:hidden">
             {/* 縦線（中央・カードの後ろで透けないようにz-index調整） */}
-            <div class="absolute left-1/2 top-0 transform -translate-x-1/2 w-1 dark:bg-gray-500 bg-gray-400 h-full z-0 pointer-events-none" />
-            
-            {experiences.map((exp) => (
-                <div class="relative flex flex-col items-center mb-10">
-                    {/* カード（縦線より前面に表示） */}
-                    <Card className="shadow-lg text-center bg-gradient-to-b from-slate-100 to-slate-300/80 dark:from-gray-800 dark:to-gray-700/60 mx-auto z-10 w-72 max-w-full relative">
-                        <h3 class="text-xl font-bold p-1">{exp.title}</h3>
-                        <a class="text-gray-600 dark:text-gray-400 hover:underline" target="blank" href={exp.link}>{exp.company}</a>
-                        <span class="text-sm text-gray-500 dark:text-gray-500">{exp.year}</span>
-                    </Card>
-                </div>
-            ))}
+            <div
+                class="absolute left-1/2 top-0 transform -translate-x-1/2 w-1 dark:bg-gray-500 bg-gray-400 h-full z-0 pointer-events-none"
+            >
+            </div>
+
+            {
+                experiences.map((exp) => (
+                    <div class="relative flex flex-col items-center mb-10">
+                        {/* カード（縦線より前面に表示） */}
+                        <Card className="shadow-lg text-center bg-gradient-to-b from-slate-100 to-slate-300/80 dark:from-gray-800 dark:to-gray-700/60 mx-auto z-10 w-72 max-w-full relative">
+                            <a
+                                href={exp.link}
+                                class="hover:underline"
+                                target="blank"
+                            >
+                                <h3 class="text-xl font-bold p-1">
+                                    {exp.company}
+                                </h3>
+                            </a>
+                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-400">
+                                {exp.title}
+                            </p>
+                            <span class="text-sm text-gray-500 dark:text-gray-500">
+                                {exp.year}
+                            </span>
+                        </Card>
+                    </div>
+                ))
+            }
         </div>
     </div>
 </section>
