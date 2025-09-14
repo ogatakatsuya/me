@@ -3,6 +3,7 @@ import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Layout from "@/layouts/BaseLayout.astro";
 import Article from "@/components/page/Article.astro";
+import { getSpeakerDeckThumbnailFromId } from "@/lib/speakerDeck";
 
 export async function getStaticPaths() {
 	const talks = await getCollection("talk");
@@ -13,6 +14,15 @@ export async function getStaticPaths() {
 }
 
 const talk: CollectionEntry<"talk"> = Astro.props;
+
+// Get SpeakerDeck thumbnail for OG image
+let ogImageUrl = `https://storage.r2.ogatakatsuya.com/${talk.id}.png`;
+if (talk.data.speakerDeckId) {
+  const thumbnailUrl = await getSpeakerDeckThumbnailFromId(talk.data.speakerDeckId);
+  if (thumbnailUrl) {
+    ogImageUrl = thumbnailUrl;
+  }
+}
 ---
 
 <Layout
@@ -23,7 +33,7 @@ const talk: CollectionEntry<"talk"> = Astro.props;
     enabled: true,
     width: 1200,
     height: 630,
-    image: new URL(`https://storage.r2.ogatakatsuya.com/${talk.id}.png`, Astro.url),
+    image: new URL(ogImageUrl, Astro.url),
   }}
   type="article"
 >

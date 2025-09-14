@@ -4,15 +4,27 @@ import type { Page } from "astro";
 import { Image } from "astro:assets";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { getSpeakerDeckThumbnailFromId } from "@/lib/speakerDeck";
 
 interface Props {
 	page: Page<CollectionEntry<"blog" | "talk">>;
 }
 const { page } = Astro.props;
+
+// Get SpeakerDeck thumbnails for talk items
+const postsWithThumbnails = await Promise.all(
+  page.data.map(async (post) => {
+    if (post.collection === "talk" && post.data.speakerDeckId) {
+      const thumbnailUrl = await getSpeakerDeckThumbnailFromId(post.data.speakerDeckId);
+      return { ...post, thumbnailUrl };
+    }
+    return { ...post, thumbnailUrl: null };
+  })
+);
 ---
 
 <article class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-5xl justify-items-center">
-  {page.data.map((post) => (
+  {postsWithThumbnails.map((post) => (
     <a 
       href={`/${post.collection}/${post.id}`} 
       class="w-full max-w-xs block transform transition-all duration-300 hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl"
@@ -22,6 +34,16 @@ const { page } = Astro.props;
           {post.collection === "blog" && (
             <Image
               src={`https://storage.r2.ogatakatsuya.com/${post.data.title}.png`}
+              alt={post.data.title}
+              width="1200"
+              height="630"
+              class="w-full object-cover rounded-sm"
+              loading="lazy"
+            />
+          )}
+          {post.collection === "talk" && post.thumbnailUrl && (
+            <Image
+              src={post.thumbnailUrl}
               alt={post.data.title}
               width="1200"
               height="630"

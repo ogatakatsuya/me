@@ -30,6 +30,7 @@ const talk = defineCollection({
 		updatedAt: z.coerce.date().optional(),
 		summary: z.string(),
 		tags: z.array(z.string()),
+		speakerDeckId: z.string(),
 	}),
 });
 
