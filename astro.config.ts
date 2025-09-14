@@ -57,10 +57,16 @@ export default defineConfig({
   },
 
   image: {
-    remotePatterns: [{
-      protocol: 'https',
-      hostname: 'storage.r2.ogatakatsuya.com',
-    }],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.r2.ogatakatsuya.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'files.speakerdeck.com',
+      }
+    ],
   },
 
   adapter: cloudflare({
