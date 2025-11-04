@@ -1,0 +1,256 @@
+---
+title: SpeakerDeckからサムネイルを取得してAstroでCloudflareから配信する方法
+slug: speakerdeck-thumbnail-astro-cloudflare
+createdAt: Nov 4, 2025
+tags:
+  - Astro
+  - Cloudflare
+  - SpeakerDeck
+summary: SpeakerDeckのIDからサムネイル画像を自動取得し、AstroサイトでOG画像として使用してCloudflareから配信するアーキテクチャの実装方法を紹介します
+theme: gray
+---
+
+## 概要
+
+このサイトでは、Talkページで、SpeakerDeckのプレゼンテーションIDからサムネイル画像を自動取得し、OG画像として使用する仕組みを実装しています。
+
+毎回SpeakerDeckにリクエストしたら迷惑がかかってしまいますが、ビルド時に1度だけ取得して、以降はAstroから配信されます。
+
+この記事では、その実装方法とアーキテクチャについて詳しく解説します。
+
+## 対象読者
+
+- AstroでWebサイトを構築している人
+- SpeakerDeckの画像を自動取得したい人
+- SpeakerDeckのサムネイルを用いてOG画像の自動生成をしたい人
+
+## アーキテクチャ概要
+
+```
+SpeakerDeck API → サムネイル取得 → Astroビルド時処理 → Cloudflare配信
+```
+
+主要な構成要素：
+
+1. **SpeakerDeckサムネイルURL生成**: IDからサムネイル画像のURLを構築
+2. **サムネイル存在確認**: HEADリクエストでサムネイルの存在を検証
+3. **フォールバック機能**: サムネイルが見つからない場合のR2ストレージ代替
+4. **Cloudflare配信**: Astroの設定でSpeakerDeck画像配信を許可
+
+## 実装詳細
+
+### 1. コンテンツスキーマ定義
+
+まず、Talkコレクションのスキーマで`speakerDeckId`フィールドを定義します：
+
+```typescript
+// src/content/config.ts
+const talk = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/talk" }),
+  schema: z.object({
+    slug: z.string(),
+    title: z.string(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date().optional(),
+    summary: z.string(),
+    tags: z.array(z.string()),
+    speakerDeckId: z.string(), // SpeakerDeckのプレゼンテーションID
+  }),
+});
+```
+
+### 2. SpeakerDeckサムネイル取得ライブラリ
+
+SpeakerDeckのサムネイルを取得するためのユーティリティ関数を実装：
+
+```typescript
+// src/lib/speakerDeck.ts
+export function getSpeakerDeckThumbnailUrl(speakerDeckId: string): string {
+  return `https://files.speakerdeck.com/presentations/${speakerDeckId}/slide_0.jpg`;
+}
+
+export async function getSpeakerDeckThumbnailFromId(speakerDeckId: string): Promise<string | null> {
+  try {
+    if (!speakerDeckId) {
+      console.warn('SpeakerDeck ID is required');
+      return null;
+    }
+
+    const thumbnailUrl = getSpeakerDeckThumbnailUrl(speakerDeckId);
+    
+    // サムネイルの存在確認
+    const response = await fetch(thumbnailUrl, { method: 'HEAD' });
+    if (!response.ok) {
+      console.warn('Thumbnail not found at:', thumbnailUrl);
+      return null;
+    }
+
+    return thumbnailUrl;
+  } catch (error) {
+    console.error('Failed to get SpeakerDeck thumbnail:', error);
+    return null;
+  }
+}
+```
+
+### 3. ページテンプレートでの使用
+
+Talkページテンプレートで、SpeakerDeckのサムネイルをOG画像として使用：
+
+```typescript
+// src/pages/talk/[slug].astro
+---
+import { getSpeakerDeckThumbnailFromId } from "@/lib/speakerDeck";
+
+const talk: CollectionEntry<"talk"> = Astro.props;
+
+// SpeakerDeckサムネイルをOG画像に使用
+let ogImageUrl = `https://storage.r2.ogatakatsuya.com/${talk.id}.png`;
+if (talk.data.speakerDeckId) {
+  const thumbnailUrl = await getSpeakerDeckThumbnailFromId(talk.data.speakerDeckId);
+  if (thumbnailUrl) {
+    ogImageUrl = thumbnailUrl;
+  }
+}
+---
+
+<Layout
+  title={`Talk | ${talk.data.title}`}
+  description={talk.data.summary}
+  og={{
+    enabled: true,
+    width: 1200,
+    height: 630,
+    image: new URL(ogImageUrl, Astro.url),
+  }}
+>
+  <!-- ページコンテンツ -->
+</Layout>
+```
+
+### 4. Astro設定でのCloudflare配信許可
+
+SpeakerDeckからの画像配信を許可するためのAstro設定：
+
+```typescript
+// astro.config.ts
+export default defineConfig({
+  image: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.r2.ogatakatsuya.com', // 自前のR2ストレージ
+      },
+      {
+        protocol: 'https',
+        hostname: 'files.speakerdeck.com', // SpeakerDeck画像ホスト
+      }
+    ],
+  },
+  
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
+      persist: true,
+    },
+  }),
+});
+```
+
+### 5. MDXファイルでの記述例
+
+実際のTalkコンテンツファイルでの記述例：
+
+```mdx
+---
+slug: "hackathon-keypoint-and-engineering"
+title: "ハッカソンの勘所とエンジニアリングへの活かし方"
+createdAt: Nov 04, 2025
+summary: "ハッカソンの勘所とエンジニアリングへの活かし方を発表します。"
+tags: ["connpass", "LT"]
+speakerDeckId: "36000a11b0964372a8f069e5ca354a05"
+---
+
+### [ハッカソン体験談を語ろう！Progate BAR 学生エンジニア限定 LT会&交流](https://progate.connpass.com/event/369854/)
+
+<iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/36000a11b0964372a8f069e5ca354a05" title="ハッカソンの勘所とエンジニアリングへの活かし方" allowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
+```
+
+## 仕組みの詳細
+
+### SpeakerDeckサムネイルURL構造
+
+SpeakerDeckのサムネイル画像は以下のURL構造でアクセス可能です：
+
+```
+https://files.speakerdeck.com/presentations/{プレゼンテーションID}/slide_0.jpg
+```
+
+最初のスライドが`slide_0.jpg`として配信されるため、これをサムネイルとして使用しています。
+
+### フォールバック戦略
+
+1. **SpeakerDeckサムネイル取得成功**: SpeakerDeckの画像をOG画像に使用
+2. **SpeakerDeckサムネイル取得失敗**: Cloudflare R2ストレージの独自画像を使用
+
+```typescript
+let ogImageUrl = `https://storage.r2.ogatakatsuya.com/${talk.id}.png`; // フォールバック
+if (talk.data.speakerDeckId) {
+  const thumbnailUrl = await getSpeakerDeckThumbnailFromId(talk.data.speakerDeckId);
+  if (thumbnailUrl) {
+    ogImageUrl = thumbnailUrl; // SpeakerDeck画像を優先使用
+  }
+}
+```
+
+### ビルド時処理
+
+Astroのビルド時に以下の処理が実行されます：
+
+1. Talkコレクションの各ページを生成
+2. `speakerDeckId`が存在する場合、サムネイル取得を試行
+3. HEADリクエストでサムネイルの存在確認
+4. 成功時：SpeakerDeck画像URL、失敗時：R2ストレージURLをOG画像に設定
+
+### Cloudflare配信の利点
+
+- **高速配信**: CDNによる世界規模での高速配信
+- **コスト効率**: 外部画像の直接配信でストレージコスト削減
+- **自動最適化**: Cloudflareの画像最適化機能
+- **信頼性**: SpeakerDeckのインフラを活用
+
+## パフォーマンス考慮事項
+
+### ビルド時間の最適化
+
+```typescript
+// HEADリクエストを使用してダウンロードせずに存在確認
+const response = await fetch(thumbnailUrl, { method: 'HEAD' });
+```
+
+HEADリクエストを使用することで、画像をダウンロードせずに存在確認のみを行い、ビルド時間を短縮しています。
+
+### エラーハンドリング
+
+```typescript
+try {
+  // サムネイル取得処理
+} catch (error) {
+  console.error('Failed to get SpeakerDeck thumbnail:', error);
+  return null; // フォールバックを使用
+}
+```
+
+ネットワークエラーやSpeakerDeckのサービス障害時でも、フォールバック画像により正常にページを生成できます。
+
+## まとめ
+
+この実装により以下のメリットを実現しています：
+
+1. **自動化**: SpeakerDeckIDを指定するだけで自動サムネイル取得
+2. **パフォーマンス**: ビルド時処理による高速ページ読み込み
+3. **信頼性**: フォールバック機能による堅牢性
+4. **コスト効率**: 外部リソース活用によるストレージコスト削減
+5. **SEO最適化**: 適切なOG画像によるソーシャルメディア最適化
+
+SpeakerDeckを活用している開発者の方はぜひ参考にしてみてください。
