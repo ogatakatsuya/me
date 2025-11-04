@@ -3,6 +3,10 @@ import matter from 'gray-matter';
 
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 type ExtractedMetadata = {
   title: string;
   tags: string[];
@@ -28,8 +32,29 @@ async function processFile(filePath: string): Promise<void> {
       }),
     };
 
-    const response = await lambdaClient.send(new InvokeCommand(invokeParams));
-    console.log(`Lambda response for ${filePath}:`, response);
+    const maxRetries = 3;
+    let retries = 0;
+
+    while (retries < maxRetries) {
+      try {
+        console.log(`Invoking Lambda for ${filePath} (attempt ${retries + 1}/${maxRetries})`);
+        const response = await lambdaClient.send(new InvokeCommand(invokeParams));
+        console.log(`Lambda response for ${filePath}:`, response);
+        return; // Success, exit retry loop
+      } catch (error) {
+        retries++;
+        console.error(`Lambda invocation failed for ${filePath} (attempt ${retries}/${maxRetries}):`, error);
+        
+        if (retries < maxRetries) {
+          const backoffDelay = 2 ** retries * 1000; // Exponential backoff: 2s, 4s, 8s
+          console.log(`Retrying in ${backoffDelay}ms...`);
+          await sleep(backoffDelay);
+        } else {
+          console.error(`Failed to invoke Lambda for ${filePath} after ${maxRetries} attempts`);
+          throw error;
+        }
+      }
+    }
 }
 
 function extractMetadata(filePath: string): ExtractedMetadata | undefined {
