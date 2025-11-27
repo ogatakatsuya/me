@@ -146,5 +146,19 @@ const { Content, headings } = await render(post);
         display: inline;
       }
     }
+
+    & blockquote {
+      margin-block: 1rem;
+      margin-left: 0.25rem;
+      padding-left: 0.75rem;
+      border-left: 4px solid var(--muted-foreground);
+      color: var(--ui-text-secondary);
+      opacity: 0.75;
+      font-style: italic;
+
+      & p {
+        margin-block: 0.5rem;
+      }
+    }
   }
 </style>
