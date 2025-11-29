@@ -1,0 +1,47 @@
+---
+import { getCollection } from "astro:content";
+
+import Layout from "@/layouts/BaseLayout.astro";
+import Article from "@/components/page/Article.astro";
+
+export async function getStaticPaths() {
+	const products = await getCollection("product");
+	return products.map((product) => ({
+		params: { slug: product.data.slug },
+		props: product,
+	}));
+}
+
+const product = Astro.props;
+---
+
+<Layout
+    title={`Product | ${product.data.title}`}
+    description={product.data.description}
+    pagefind={true}
+    og={{
+        enabled: true,
+        width: 1200,
+        height: 630,
+        image: new URL(`https://storage.r2.ogatakatsuya.com/${product.data.title}.png`, Astro.url),
+    }}
+    type="article"
+>
+    <main class="min-h-screen pt-30 pb-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <article class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 lg:p-12">
+                <!-- プロダクトヘッダー -->
+                <header class="mb-8">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                        {product.data.title}
+                    </h1>
+                    <div class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed border-l-4 border-blue-500 pl-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-r-lg">
+                        {product.data.description}
+                    </div>
+                </header>
+
+                <Article post={product} showToc={false} />
+            </article>
+        </div>
+    </main>
+</Layout>

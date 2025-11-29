@@ -4,16 +4,17 @@ import type { CollectionEntry } from "astro:content";
 import Toc from "../ui/Toc.astro";
 
 interface Props {
-	post: CollectionEntry<"blog" | "talk">;
+	post: CollectionEntry<"blog" | "talk" | "product">;
+	showToc?: boolean;
 }
 
-const { post } = Astro.props;
+const { post, showToc = true } = Astro.props;
 
 const { Content, headings } = await render(post);
 ---
 
 <article id="post">
-  <Toc headings={headings} />
+  {showToc && <Toc headings={headings} />}
   <Content />
 </article>
 

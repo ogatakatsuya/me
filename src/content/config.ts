@@ -34,7 +34,19 @@ const talk = defineCollection({
 	}),
 });
 
+const product = defineCollection({
+	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/product" }),
+	schema: z.object({
+		slug: z.string(),
+		title: z.string(),
+		description: z.string(),
+		link: z.string().url().optional(),
+		image: z.string(),
+	}),
+});
+
 export const collections = {
 	blog,
 	talk,
+	product,
 };
