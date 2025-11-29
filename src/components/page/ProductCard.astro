@@ -1,6 +1,4 @@
 ---
-import { Image } from "astro:assets";
-
 interface Props {
 	title: string;
 	description: string;
@@ -14,7 +12,7 @@ const { title, description, tags, link, image } = Astro.props;
 ---
 
 <a href="#" class="group block">
-	<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden">
+	<div class="bg-gradient-to-b from-slate-200 to-slate-300/50 dark:from-slate-800 dark:to-slate-700/50 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden">
 		<div class="flex flex-col md:flex-row md:h-40">
 			<!-- 左側：テキストコンテンツ -->
 			<div class="flex flex-col flex-grow min-w-0 p-6">
@@ -40,14 +38,15 @@ const { title, description, tags, link, image } = Astro.props;
 				)}
 			</div>
 			<!-- 右側：サムネイル画像 -->
-			<div class="w-full md:w-48 h-48 md:h-auto flex-shrink-0 bg-gray-100 dark:bg-gray-700 overflow-hidden flex items-center justify-center p-2">
+			<div class="relative w-full md:w-48 h-48 md:h-auto flex-shrink-0 bg-gray-100 dark:bg-gray-700 overflow-hidden flex items-center justify-center p-2">
+				<div class="absolute inset-0 rounded-lg blur-xl opacity-0 group-hover:opacity-60 transition duration-300 pointer-events-none" style="background: radial-gradient(circle, #bfdbfe 0%, #3b82f6 40%, transparent 80%);"/>
 				<img
 					src={image}
 					alt={title}
 					loading="lazy"
 					decoding="async"
 					fetchpriority="auto"
-					class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+					class="relative z-10 w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
 				/>
 			</div>
 		</div>
