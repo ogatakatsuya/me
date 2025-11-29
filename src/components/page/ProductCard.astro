@@ -41,7 +41,13 @@ const { title, description, tags, link, image } = Astro.props;
 			</div>
 			<!-- 右側：サムネイル画像 -->
 			<div class="w-full md:w-48 h-48 md:h-auto flex-shrink-0 bg-gray-100 dark:bg-gray-700 overflow-hidden flex items-center justify-center p-2">
-				<img src={image} alt={title} class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+				<Image
+					src={image}
+					alt={title}
+					width={192}
+					height={192}
+					class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+				/>
 			</div>
 		</div>
 	</div>
