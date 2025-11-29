@@ -24,15 +24,17 @@ const products = await getCollection("product");
 			<div class="max-w-7xl mx-auto flex justify-center">
 				<!-- プロダクトカード一覧 -->
 				{products.length > 0 ? (
-					<div class="flex flex-col gap-3 max-w-4xl w-full">
+					<div class="flex flex-col max-w-4xl w-full">
 						{products.map((product) => (
-							<ProductCard
-								title={product.data.title}
-								description={product.data.description}
-								slug={product.data.slug}
-								link={product.data.link}
-								image={product.data.image}
-							/>
+							<div class="mb-4">
+								<ProductCard
+									title={product.data.title}
+									description={product.data.description}
+									slug={product.data.slug}
+									link={product.data.link}
+									image={product.data.image}
+								/>
+							</div>
 						))}
 					</div>
 				) : (
