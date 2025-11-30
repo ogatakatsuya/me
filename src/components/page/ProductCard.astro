@@ -8,7 +8,7 @@ interface Props {
 	image: string;
 }
 
-const { title, description, tags, link, image } = Astro.props;
+const { title, description, tags, image } = Astro.props;
 ---
 
 <a href="#" class="group block">
@@ -19,11 +19,6 @@ const { title, description, tags, link, image } = Astro.props;
 				<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
 					{title}
 				</h3>
-				{link && (
-					<a href={link} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm underline break-all mb-2" onclick="event.stopPropagation()">
-						{link}
-					</a>
-				)}
 				<p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow text-xs line-clamp-2">
 					{description}
 				</p>
